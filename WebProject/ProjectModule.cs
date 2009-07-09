@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace JazCms.Kernel
+namespace JazCms.WebProject
 {
-	public interface IStoreProvider:IProvider
+	public class ProjectModule:ProjectItem
 	{
 	}
 }

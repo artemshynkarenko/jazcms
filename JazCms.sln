@@ -1,7 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazCms.Kernel", ".\Kernel\JazCms.Kernel.csproj", "{2A0A3A23-EB90-4B0E-89E1-E1062EEA8642}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazCms.Kernel", "Kernel\JazCms.Kernel.csproj", "{2A0A3A23-EB90-4B0E-89E1-E1062EEA8642}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazCms.WebProject", "WebProject\JazCms.WebProject.csproj", "{86E8AF1B-94BC-449B-8A92-9BECE908BA94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazCms.WebSite", "WebSite\JazCms.WebSite.csproj", "{22B17A04-7A39-4D17-B8C1-7E76264187DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazCms.WebProject.WinEditor", "WebProject.WinEditor\JazCms.WebProject.WinEditor.csproj", "{7492F596-884C-439B-9AE2-9317DB35B93B}"
 EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
@@ -17,6 +23,18 @@ Global
 		{2A0A3A23-EB90-4B0E-89E1-E1062EEA8642}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A0A3A23-EB90-4B0E-89E1-E1062EEA8642}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A0A3A23-EB90-4B0E-89E1-E1062EEA8642}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86E8AF1B-94BC-449B-8A92-9BECE908BA94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86E8AF1B-94BC-449B-8A92-9BECE908BA94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86E8AF1B-94BC-449B-8A92-9BECE908BA94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86E8AF1B-94BC-449B-8A92-9BECE908BA94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22B17A04-7A39-4D17-B8C1-7E76264187DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22B17A04-7A39-4D17-B8C1-7E76264187DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22B17A04-7A39-4D17-B8C1-7E76264187DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22B17A04-7A39-4D17-B8C1-7E76264187DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7492F596-884C-439B-9AE2-9317DB35B93B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7492F596-884C-439B-9AE2-9317DB35B93B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7492F596-884C-439B-9AE2-9317DB35B93B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7492F596-884C-439B-9AE2-9317DB35B93B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
