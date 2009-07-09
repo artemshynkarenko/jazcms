@@ -8,5 +8,6 @@ namespace JazCms.Kernel
 	public interface IJazCmsObject
 	{
 		Guid Identity { get; set; }
+		string SystemName { get; set; }
 	}
 }

@@ -8,7 +8,7 @@ namespace JazCms.Kernel
 	/// <summary>
 	/// This is root
 	/// </summary>
-	public interface IApplication
+	public interface IApplication:IStructureElement, ISettingOwner, IRequestProcessor, IStructureInstance<IApplication>
 	{
 	}
 }

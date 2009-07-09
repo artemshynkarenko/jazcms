@@ -5,7 +5,7 @@ using System.Text;
 
 namespace JazCms.Kernel
 {
-	public interface IModule
+	public interface IModule : IStructureElement, ISettingOwner
 	{
 	}
 }

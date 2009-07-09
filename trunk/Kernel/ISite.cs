@@ -5,7 +5,8 @@ using System.Text;
 
 namespace JazCms.Kernel
 {
-	public interface ISite:IStructureElement
+	public interface ISite : IStructureElement, ISettingOwner, IRequestProcessor
 	{
+		IPageContentBuilder ContentBuilder { get; set; }
 	}
 }

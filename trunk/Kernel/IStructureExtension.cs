@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 
 namespace JazCms.Kernel
 {
-	[Serializable]
 	public interface IStructureExtension:IJazCmsObject
 	{
 		bool CanExtend(IStructureElement element);

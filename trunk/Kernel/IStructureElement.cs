@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 
 namespace JazCms.Kernel
 {
-	[Serializable]
 	public interface IStructureElement:IJazCmsObject
 	{
 		Collection<IStructureElement> ChildElements { get; }
