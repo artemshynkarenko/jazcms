@@ -10,10 +10,10 @@ namespace JazCms.WebProject
 	{
 		public Configuration Configuration { get; set; }
 
-		public void AnalizeProjectFile();
+		//public void AnalizeProjectFile();
 
-		public ISingleSiteApplication Aplication { get; }
+		//public ISingleSiteApplication Aplication { get; }
 
-		public void SaveApplicationChanges();
+		//public void SaveApplicationChanges();
 	}
 }
