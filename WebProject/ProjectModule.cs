@@ -5,7 +5,7 @@ using System.Text;
 
 namespace JazCms.WebProject
 {
-	public class ProjectModule:ProjectItem
+	public class ProjectModule//:ProjectItem
 	{
 	}
 }
