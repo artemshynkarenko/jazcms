@@ -18,6 +18,7 @@ using System.Reflection;
 using System.ComponentModel.Design;
 using JazCms.Kernel;
 using JazCms.WebProject;
+using JazCms.StoreProviders.XmlStore;
 
 namespace JazCms.WebProject.WinEditor
 {
@@ -53,6 +54,8 @@ namespace JazCms.WebProject.WinEditor
                     XmlDocument doc = new XmlDocument();
                     docName = ofd.FileName.ToString();
                     doc.Load(docName);
+                    XmlDocument docExport = new XmlDocument();
+                    string exportFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
 
                     XmlNode root = doc.DocumentElement;
 
@@ -96,6 +99,7 @@ namespace JazCms.WebProject.WinEditor
                             string jazNamespaceNode = jazNamespace;
                             if (!string.IsNullOrEmpty(directory))
                                 jazNamespaceNode = jazNamespace + "." + directory;
+
                             TextBox tbClassName = new TextBox() 
                             { 
                                 Name = "tbClassName"+location, 
@@ -110,6 +114,18 @@ namespace JazCms.WebProject.WinEditor
                             };
                             tbNameSpace.Left = tbClassName.Width +location.Length * 11 + 70;
                             tbNameSpace.Top = checkBoxPossition;
+
+                            string exFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
+                            XmlStoreProvider storeProvider = new XmlStoreProvider(exFilePath);
+                            SettingConstructor setting = new SettingConstructor(exFilePath, location);
+                            storeProvider.LoadSettings(setting.SettingOwner);
+                            SettingConstructor sc = storeProvider.Constructor;
+
+                            if (sc.IsSetted)
+                            {
+                                tbNameSpace.Text = sc.NameSpace;
+                                tbClassName.Text = sc.ClassName;
+                            }
                             groupBoxEditedNodes.Controls.Add(tbNameSpace);
                             groupBoxEditedNodes.Controls.Add(tbClassName);
                         }
@@ -200,6 +216,11 @@ namespace JazCms.WebProject.WinEditor
                                          FileGenerator.BuildJAZContent(tbNS.Text, tbCN.Text, insertedNodeName),
                                          fileFullPath
                                         );
+                                    string exportFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
+                                    XmlStoreProvider storeProvider = new XmlStoreProvider(exportFilePath);
+                                    SettingConstructor setting = new SettingConstructor(exportFilePath, insertedNodeName,tbNS.Text, tbCN.Text);
+                                    storeProvider.SaveSettings(setting.SettingOwner);
+
 
                                 }
                             }
