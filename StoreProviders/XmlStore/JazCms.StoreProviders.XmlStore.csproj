@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2A0A3A23-EB90-4B0E-89E1-E1062EEA8642}</ProjectGuid>
+    <ProjectGuid>{24D17132-35AB-4C0F-AF72-475900ECF7B5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JazCms.Kernel</RootNamespace>
-    <AssemblyName>JazCms.Kernel</AssemblyName>
+    <RootNamespace>JazCms.StoreProviders.XmlStore</RootNamespace>
+    <AssemblyName>JazCms.StoreProviders.XmlStore</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>Svn</SccProjectName>
@@ -39,7 +39,6 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -50,27 +49,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IApplication.cs" />
-    <Compile Include="IStructureInstance.cs" />
-    <Compile Include="IJazCmsObject.cs" />
-    <Compile Include="IModule.cs" />
-    <Compile Include="IModuleInstance.cs" />
-    <Compile Include="IPage.cs" />
-    <Compile Include="IPageContentBuilder.cs" />
-    <Compile Include="IPageInstance.cs" />
-    <Compile Include="IProvider.cs" />
-    <Compile Include="IRequestProcessor.cs" />
-    <Compile Include="ISettingCollection.cs" />
-    <Compile Include="ISettingOwner.cs" />
-    <Compile Include="ISettingStoreProvider.cs" />
-    <Compile Include="ISingleSiteApplication.cs" />
-    <Compile Include="ISite.cs" />
-    <Compile Include="ISiteInstance.cs" />
-    <Compile Include="IStoreProvider.cs" />
-    <Compile Include="IStructureElement.cs" />
-    <Compile Include="IStructureExtension.cs" />
-    <Compile Include="IStructureStoreProvider.cs" />
+    <Compile Include="XmlStoreProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Kernel\JazCms.Kernel.csproj">
+      <Project>{2A0A3A23-EB90-4B0E-89E1-E1062EEA8642}</Project>
+      <Name>JazCms.Kernel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
