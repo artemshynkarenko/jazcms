@@ -62,6 +62,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -70,6 +71,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SelectProgectDialogForm.resx">
       <DependentUpon>SelectProgectDialogForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -95,6 +97,10 @@
     <ProjectReference Include="..\Kernel\JazCms.Kernel.csproj">
       <Project>{2A0A3A23-EB90-4B0E-89E1-E1062EEA8642}</Project>
       <Name>JazCms.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StoreProviders\XmlStore\JazCms.StoreProviders.XmlStore.csproj">
+      <Project>{24D17132-35AB-4C0F-AF72-475900ECF7B5}</Project>
+      <Name>JazCms.StoreProviders.XmlStore</Name>
     </ProjectReference>
     <ProjectReference Include="..\WebProject\JazCms.WebProject.csproj">
       <Project>{86E8AF1B-94BC-449B-8A92-9BECE908BA94}</Project>
