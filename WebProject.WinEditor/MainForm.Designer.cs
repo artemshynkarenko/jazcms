@@ -38,7 +38,9 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonCreate = new System.Windows.Forms.Button();
             this.groupBoxEditedNodes = new System.Windows.Forms.GroupBox();
+            this.labelGuess = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
+            this.groupBoxEditedNodes.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -67,8 +69,9 @@
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.newToolStripMenuItem.Text = "New";
+            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
@@ -113,12 +116,24 @@
             // 
             // groupBoxEditedNodes
             // 
+            this.groupBoxEditedNodes.Controls.Add(this.labelGuess);
             this.groupBoxEditedNodes.Location = new System.Drawing.Point(12, 27);
             this.groupBoxEditedNodes.Name = "groupBoxEditedNodes";
             this.groupBoxEditedNodes.Size = new System.Drawing.Size(570, 323);
             this.groupBoxEditedNodes.TabIndex = 3;
             this.groupBoxEditedNodes.TabStop = false;
             this.groupBoxEditedNodes.Text = "Please select neccessary nodes";
+            // 
+            // labelGuess
+            // 
+            this.labelGuess.AutoSize = true;
+            this.labelGuess.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelGuess.Location = new System.Drawing.Point(244, 10);
+            this.labelGuess.Name = "labelGuess";
+            this.labelGuess.Size = new System.Drawing.Size(195, 13);
+            this.labelGuess.TabIndex = 0;
+            this.labelGuess.Text = "guessed namespaces and class names:";
+            this.labelGuess.Visible = false;
             // 
             // MainForm
             // 
@@ -134,6 +149,8 @@
             this.Text = "JazCms: Web Project Editor";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.groupBoxEditedNodes.ResumeLayout(false);
+            this.groupBoxEditedNodes.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -151,6 +168,7 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.Button buttonCreate;
         private System.Windows.Forms.GroupBox groupBoxEditedNodes;
+        private System.Windows.Forms.Label labelGuess;
 	}
 }
 
