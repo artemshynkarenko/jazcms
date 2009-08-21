@@ -40,7 +40,6 @@
             this.groupBoxEditedNodes = new System.Windows.Forms.GroupBox();
             this.labelGuess = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
-            this.groupBoxEditedNodes.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -69,7 +68,7 @@
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.newToolStripMenuItem.Text = "New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
@@ -85,6 +84,7 @@
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // removeToolStripMenuItem
             // 
@@ -106,7 +106,12 @@
             // 
             // buttonCreate
             // 
-            this.buttonCreate.Location = new System.Drawing.Point(597, 363);
+            this.buttonCreate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonCreate.FlatAppearance.BorderSize = 3;
+            this.buttonCreate.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.buttonCreate.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.buttonCreate.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.buttonCreate.Location = new System.Drawing.Point(510, 363);
             this.buttonCreate.Name = "buttonCreate";
             this.buttonCreate.Size = new System.Drawing.Size(146, 33);
             this.buttonCreate.TabIndex = 2;
@@ -116,10 +121,11 @@
             // 
             // groupBoxEditedNodes
             // 
-            this.groupBoxEditedNodes.Controls.Add(this.labelGuess);
-            this.groupBoxEditedNodes.Location = new System.Drawing.Point(12, 27);
+            this.groupBoxEditedNodes.AutoSize = true;
+            this.groupBoxEditedNodes.BackColor = System.Drawing.Color.White;
+            this.groupBoxEditedNodes.Location = new System.Drawing.Point(12, 41);
             this.groupBoxEditedNodes.Name = "groupBoxEditedNodes";
-            this.groupBoxEditedNodes.Size = new System.Drawing.Size(570, 323);
+            this.groupBoxEditedNodes.Size = new System.Drawing.Size(644, 316);
             this.groupBoxEditedNodes.TabIndex = 3;
             this.groupBoxEditedNodes.TabStop = false;
             this.groupBoxEditedNodes.Text = "Please select neccessary nodes";
@@ -127,12 +133,13 @@
             // labelGuess
             // 
             this.labelGuess.AutoSize = true;
-            this.labelGuess.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelGuess.Location = new System.Drawing.Point(244, 10);
+            this.labelGuess.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelGuess.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this.labelGuess.Location = new System.Drawing.Point(301, 31);
             this.labelGuess.Name = "labelGuess";
-            this.labelGuess.Size = new System.Drawing.Size(195, 13);
+            this.labelGuess.Size = new System.Drawing.Size(230, 13);
             this.labelGuess.TabIndex = 0;
-            this.labelGuess.Text = "guessed namespaces and class names:";
+            this.labelGuess.Text = "guessed class names and namespaces:";
             this.labelGuess.Visible = false;
             // 
             // MainForm
@@ -140,7 +147,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
+            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(755, 408);
+            this.Controls.Add(this.labelGuess);
             this.Controls.Add(this.groupBoxEditedNodes);
             this.Controls.Add(this.buttonCreate);
             this.Controls.Add(this.menuStrip1);
@@ -149,8 +158,6 @@
             this.Text = "JazCms: Web Project Editor";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.groupBoxEditedNodes.ResumeLayout(false);
-            this.groupBoxEditedNodes.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
