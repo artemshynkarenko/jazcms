@@ -28,17 +28,21 @@ namespace JazCms.WebProject.WinEditor
         protected string docName;
         protected string jazNamespace;
         protected string jazClassName;
+        protected ProjectSettings progectSettings;
 
         public MainForm()
         {
             docName = string.Empty;
             jazNamespace = string.Empty;
             jazClassName = string.Empty;
+            progectSettings = new ProjectSettings();
             InitializeComponent();
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            groupBoxEditedNodes.Controls.Clear();
+            
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.InitialDirectory = "c:\\";
             ofd.Filter = "project files (*.csproj)|*.csproj|All files (*.*)|*.*";
@@ -50,7 +54,7 @@ namespace JazCms.WebProject.WinEditor
                 try
                 {
                     #region CheckBox list creator and inserting reference
-
+                    groupBoxEditedNodes.UseWaitCursor = true;
                     XmlDocument doc = new XmlDocument();
                     docName = ofd.FileName.ToString();
                     doc.Load(docName);
@@ -71,7 +75,8 @@ namespace JazCms.WebProject.WinEditor
 
                     XmlNode nameSpace = root.SelectSingleNode("//ns:RootNamespace", nsmgr);
                     jazNamespace = nameSpace.InnerText;
-                    
+                    progectSettings.RootNameSpace = jazNamespace;
+
                     XmlNodeList nodeList = root.SelectNodes("//ns:Compile", nsmgr);
                     List<XmlNode> nodeCollection = new List<XmlNode>();
                     foreach (XmlNode node in nodeList)
@@ -90,53 +95,56 @@ namespace JazCms.WebProject.WinEditor
                         checkBoxEditedNodes.Text = location;
                         string xPath = "//ns:Compile[@Include='" + location.Replace(".aspx.cs", ".aspx.jaz.cs") + "']";
                         XmlNodeList jazNodesList = root.SelectNodes(xPath, nsmgr);
-                        if (jazNodesList.Count > 0)
-                            checkBoxEditedNodes.Checked = true;
-                        else
+                        jazClassName = Path.GetFileName(location).Replace(".aspx.cs", "");
+                        string directory = Path.GetDirectoryName(location).Replace("\\", ".");
+                        string jazNamespaceNode = jazNamespace;
+                        if (!string.IsNullOrEmpty(directory))
+                            jazNamespaceNode = jazNamespace + "." + directory;
+
+                        TextBox tbClassName = new TextBox()
                         {
-                            jazClassName = Path.GetFileName(location).Replace(".aspx.cs","");
-                            string directory = Path.GetDirectoryName(location).Replace("//",".");
-                            string jazNamespaceNode = jazNamespace;
-                            if (!string.IsNullOrEmpty(directory))
-                                jazNamespaceNode = jazNamespace + "." + directory;
+                            Name = "tbClassName" + location,
+                            Text = jazClassName
+                        };
+                        tbClassName.Top = checkBoxPossition;
+                        tbClassName.Left = 50 + location.Trim().Length * 8;
+                        TextBox tbNameSpace = new TextBox()
+                        {
+                            Name = "tbNameSpace" + location,
+                            Text = jazNamespaceNode
+                        };
+                        tbNameSpace.Left = tbClassName.Width + location.Trim().Length * 8 + 70;
+                        tbNameSpace.Width = 200;
+                        tbNameSpace.Top = checkBoxPossition;
 
-                            TextBox tbClassName = new TextBox() 
-                            { 
-                                Name = "tbClassName"+location, 
-                                Text = jazClassName 
-                            };
-                            tbClassName.Top = checkBoxPossition;
-                                tbClassName.Left = 50 + location.Length * 11;
-                            TextBox tbNameSpace = new TextBox() 
-                            {
-                                Name = "tbNameSpace" + location,
-                                Text = jazNamespaceNode 
-                            };
-                            tbNameSpace.Left = tbClassName.Width +location.Length * 11 + 70;
-                            tbNameSpace.Top = checkBoxPossition;
+                        string exFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
+                        PageSettings pageSet = new PageSettings(exFilePath, location);
+                        XmlStoreProvider storeProvider = new XmlStoreProvider(exFilePath);
+                        progectSettings.SelectedPage = pageSet;
+                        storeProvider.LoadSettings(progectSettings);
 
-                            string exFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
-                            XmlStoreProvider storeProvider = new XmlStoreProvider(exFilePath);
-                            SettingConstructor setting = new SettingConstructor(exFilePath, location);
-                            storeProvider.LoadSettings(setting.SettingOwner);
-                            SettingConstructor sc = storeProvider.Constructor;
-
-                            if (sc.IsSetted)
-                            {
-                                tbNameSpace.Text = sc.NameSpace;
-                                tbClassName.Text = sc.ClassName;
-                            }
-                            groupBoxEditedNodes.Controls.Add(tbNameSpace);
-                            groupBoxEditedNodes.Controls.Add(tbClassName);
+                        if (progectSettings.IsSetted)
+                        {
+                            tbNameSpace.Text = progectSettings.SelectedPage.NameSpace;
+                            tbClassName.Text = progectSettings.SelectedPage.ClassName;
                         }
+                        groupBoxEditedNodes.Controls.Add(tbNameSpace);
+                        groupBoxEditedNodes.Controls.Add(tbClassName);
+                        if (jazNodesList.Count > 0)
+                        {
+                            checkBoxEditedNodes.Checked = true;
+                            tbNameSpace.Enabled = false;
+                            tbClassName.Enabled = false;
+                        }
+
                         checkBoxEditedNodes.Tag = selectedNodes;
                         checkBoxEditedNodes.Top = checkBoxPossition;
                         checkBoxEditedNodes.Left = 50;
-                        checkBoxEditedNodes.Width = checkBoxEditedNodes.Text.Length * 11;
+                        checkBoxEditedNodes.Width = checkBoxEditedNodes.Text.Trim().Length * 8;
                         checkBoxPossition += 40;
                         groupBoxEditedNodes.Height = checkBoxPossition;
                         groupBoxEditedNodes.Controls.Add(checkBoxEditedNodes);
-                        
+
                     }
 
                     if (groupBoxEditedNodes.Controls.Count > 0)
@@ -149,6 +157,11 @@ namespace JazCms.WebProject.WinEditor
                         labelGuess.Visible = false;
 
                     #endregion
+
+                    buttonCreate.Top = groupBoxEditedNodes.Height + 50;
+                    buttonCreate.Left = groupBoxEditedNodes.Left + groupBoxEditedNodes.Width - buttonCreate.Width;
+                    groupBoxEditedNodes.UseWaitCursor = false;
+
                 }
                 catch (Exception ex)
                 {
@@ -204,6 +217,7 @@ namespace JazCms.WebProject.WinEditor
                                     string fileFullPath = docName.Replace(uri.Segments[uri.Segments.Length - 1].ToString(), "") +
                                              insertedNode.Attributes.GetNamedItem("Include").Value
                                              .Replace("aspx.cs", "aspx.jaz.cs");
+                                    progectSettings.AddNewJazFile(fileFullPath);
                                     FileInfo newFile = new FileInfo(fileFullPath);
                                     FileStream fs = newFile.Create();
                                     fs.Dispose();
@@ -217,12 +231,11 @@ namespace JazCms.WebProject.WinEditor
                                          fileFullPath
                                         );
                                     string exportFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
+                                    PageSettings pageSet = new PageSettings(exportFilePath, insertedNodeName, tbNS.Text, tbCN.Text);
                                     XmlStoreProvider storeProvider = new XmlStoreProvider(exportFilePath);
-                                    SettingConstructor setting = new SettingConstructor(exportFilePath, insertedNodeName,tbNS.Text, tbCN.Text);
-                                    storeProvider.SaveSettings(setting.SettingOwner);
-
-
-                                }
+                                    progectSettings.SelectedPage = pageSet;
+                                    storeProvider.SaveSettings(progectSettings);
+                                 }
                             }
                             else
                             {
@@ -233,12 +246,14 @@ namespace JazCms.WebProject.WinEditor
 
                                     insertedNode.ParentNode.RemoveChild(removedNode);
                                     insertedNode.OwnerDocument.Save(docName);
-
-                                    FileInfo newFile =
-                                    new FileInfo(docName.Replace(uri.Segments[uri.Segments.Length - 1].ToString(), "") +
+                                    string unselectedFileName = docName.Replace(uri.Segments[uri.Segments.Length - 1].ToString(), "") +
                                                  insertedNode.Attributes.GetNamedItem("Include").Value
-                                                 .Replace("aspx.cs", "aspx.jaz.cs"));
+                                                 .Replace("aspx.cs", "aspx.jaz.cs");
+                                    FileInfo newFile = new FileInfo(unselectedFileName);
                                     newFile.Delete();
+
+                                    if (progectSettings.GetJazFileCollection().Contains(unselectedFileName))
+                                        progectSettings.RemoveJazFileFromCollection(unselectedFileName);
                                 }
 
                             }
@@ -265,6 +280,11 @@ namespace JazCms.WebProject.WinEditor
         {
             groupBoxEditedNodes.Controls.Clear();
             labelGuess.Visible = false;
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+           this.buttonCreate_Click(sender, e);
         }
     }
 }

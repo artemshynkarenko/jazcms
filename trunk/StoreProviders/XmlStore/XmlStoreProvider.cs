@@ -5,6 +5,7 @@ using System.Text;
 using JazCms.Kernel;
 using System.Xml;
 using System.IO;
+using JazCms.WebProject;
 
 namespace JazCms.StoreProviders.XmlStore
 {
@@ -12,8 +13,8 @@ namespace JazCms.StoreProviders.XmlStore
 	{
 		#region ISettingStoreProvider Members
 
-        private SettingConstructor settingConstructor;
-        public SettingConstructor Constructor
+        private ProjectSettings settingConstructor;
+        public ProjectSettings Constructor
         {
             get { return settingConstructor; }
         }
@@ -38,9 +39,10 @@ namespace JazCms.StoreProviders.XmlStore
 
 		public void LoadSettings(ISettingOwner owner)
 		{
-            SettingConstructor sc = (SettingConstructor)owner.SettingCollection;
-            string filePath = sc.FilePath;
-            string fileName = sc.FileName;
+            ProjectSettings prjset = (ProjectSettings)owner;
+            PageSettings ps = (PageSettings)prjset.SelectedPage;
+            string filePath = ps.FilePath;
+            string fileName = ps.FileName;
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(filePath);
@@ -50,37 +52,40 @@ namespace JazCms.StoreProviders.XmlStore
             {
                 string nameSpace = node.GetAttribute("Namespace");
                 string className = node.GetAttribute("ClassName");
-                sc = new SettingConstructor(filePath, fileName, nameSpace, className);
-                sc.IsSetted = true;
-                settingConstructor = sc;
+                PageSettings newPage = new PageSettings(filePath, fileName, nameSpace, className);
+                
+                prjset.SelectedPage = newPage;
+                prjset.IsSetted = true;
+                settingConstructor = prjset;
             }
             else
             {
-                sc.IsSetted = false;
-                settingConstructor = sc;
+                prjset.IsSetted = false;
+                settingConstructor = prjset;
             }
 		}
 
 		public void SaveSettings(ISettingOwner owner)
 		{
-            SettingConstructor sc = (SettingConstructor)owner.SettingCollection;
-            string filePath = sc.FilePath;
-            string fileName = sc.FileName;
+            ProjectSettings prjset = (ProjectSettings)owner;
+            PageSettings ps = (PageSettings)prjset.SelectedPage;
+            string filePath = ps.FilePath;
+            string fileName = ps.FileName;
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(filePath);
             XmlElement node = (XmlElement)xmlDoc.SelectSingleNode("//Settings");
             XmlElement existingNode = (XmlElement)xmlDoc.SelectSingleNode("//ExportFile[@FileName='" + fileName + "']");
             if (existingNode != null)
             {
-                existingNode.SetAttribute("Namespace", sc.NameSpace);
-                existingNode.SetAttribute("ClassName", sc.ClassName);
+                existingNode.SetAttribute("Namespace", ps.NameSpace);
+                existingNode.SetAttribute("ClassName", ps.ClassName);
             }
             else
             {
                 XmlElement child = node.OwnerDocument.CreateElement("ExportFile");
-                child.SetAttribute("Namespace", sc.NameSpace);
-                child.SetAttribute("ClassName", sc.ClassName);
-                child.SetAttribute("FileName", sc.FileName);
+                child.SetAttribute("Namespace", ps.NameSpace);
+                child.SetAttribute("ClassName", ps.ClassName);
+                child.SetAttribute("FileName", ps.FileName);
                 node.AppendChild(child);
             }
             xmlDoc.Save(filePath);
@@ -117,73 +122,4 @@ namespace JazCms.StoreProviders.XmlStore
 		#endregion
 	}
 
-    public class SettingConstructor : ISettingOwner, ISettingCollection
-    {
-        private string filePathSetting;
-        private string nameSpaceSetting;
-        private string classNameSetting;
-        private string fileNameSetting;
-
-        public string FilePath
-        {
-            get { return filePathSetting; }
-        }
-
-        public string NameSpace
-        {
-            get { return nameSpaceSetting; }
-        }
-
-        public string ClassName
-        {
-            get { return classNameSetting; }
-        }
-
-        public string FileName
-        {
-            get { return fileNameSetting; }
-        }
-
-        public SettingConstructor(string filePath, string fileName, string nameSpace, string className)
-        {
-            this.fileNameSetting = fileName;
-            this.filePathSetting = filePath;
-            this.nameSpaceSetting = nameSpace;
-            this.classNameSetting = className;
-        }
-
-        public SettingConstructor( string filePath, string fileName)
-        {
-             this.filePathSetting = filePath;
-             this.fileNameSetting = fileName;
-             this.nameSpaceSetting = null;
-             this.classNameSetting = null;
-        }
-
-          public ISettingCollection SettingCollection 
-          {
-              get
-              {
-                  return new SettingConstructor(filePathSetting, fileNameSetting, nameSpaceSetting, classNameSetting);
-              }
-          }
-
-          public ISettingOwner SettingOwner
-          {
-              get
-              {
-                  return (ISettingOwner)this.SettingCollection;
-              }
-          }
-          public Guid Identity { get; set; }
-          public string SystemName { get; set; }
-          public bool IsSetted { get; set; }
-    }
-
-    public class SettingCollectionConstructor 
-    {
-      
-    }
-
-    
 }
