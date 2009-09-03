@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7492F596-884C-439B-9AE2-9317DB35B93B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -12,10 +12,14 @@
     <AssemblyName>JazCms.WebProject.WinEditor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>Svn</SccProjectName>
-    <SccLocalPath>Svn</SccLocalPath>
-    <SccAuxPath>Svn</SccAuxPath>
-    <SccProvider>SubversionScc</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -69,8 +73,8 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SelectProgectDialogForm.resx">
-      <DependentUpon>SelectProgectDialogForm.cs</DependentUpon>
+    <EmbeddedResource Include="ProgectSettingForm.resx">
+      <DependentUpon>ProgectSettingForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
@@ -86,11 +90,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="SelectProgectDialogForm.cs">
+    <Compile Include="ProgectSettingForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SelectProgectDialogForm.Designer.cs">
-      <DependentUpon>SelectProgectDialogForm.cs</DependentUpon>
+    <Compile Include="ProgectSettingForm.Designer.cs">
+      <DependentUpon>ProgectSettingForm.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

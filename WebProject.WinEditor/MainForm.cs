@@ -22,7 +22,7 @@ using JazCms.StoreProviders.XmlStore;
 
 namespace JazCms.WebProject.WinEditor
 {
-     
+
     public partial class MainForm : Form
     {
         protected string docName;
@@ -37,12 +37,22 @@ namespace JazCms.WebProject.WinEditor
             jazClassName = string.Empty;
             progectSettings = new ProjectSettings();
             InitializeComponent();
+            this.SizeChanged += new EventHandler(page_SizeChanged);
+        }
+
+        protected void page_SizeChanged(object sender, EventArgs e)
+        {
+            dataGridNodesTable.Width = this.Width - 50;
+            dataGridNodesTable.Height = this.Height - 200;
+            buttonCreate.Top = dataGridNodesTable.Height + 50;
+            buttonCreate.Left = dataGridNodesTable.Width - 150;
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            groupBoxEditedNodes.Controls.Clear();
-            
+            dataGridNodesTable.Rows.Clear();
+            dataGridNodesTable.Columns.Clear();
+
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.InitialDirectory = "c:\\";
             ofd.Filter = "project files (*.csproj)|*.csproj|All files (*.*)|*.*";
@@ -53,25 +63,28 @@ namespace JazCms.WebProject.WinEditor
             {
                 try
                 {
-                    #region CheckBox list creator and inserting reference
-                    groupBoxEditedNodes.UseWaitCursor = true;
+                    #region CheckBox list creator
+
+                    progectSettings = new ProjectSettings();
+
+                    dataGridNodesTable.UseWaitCursor = true;
                     XmlDocument doc = new XmlDocument();
                     docName = ofd.FileName.ToString();
                     doc.Load(docName);
                     XmlDocument docExport = new XmlDocument();
                     string exportFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
+                    progectSettings.ExportFileName = exportFilePath;
 
                     XmlNode root = doc.DocumentElement;
 
                     XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
                     nsmgr.AddNamespace("ns", root.NamespaceURI);
 
-                    #region assembly reference creation
-
                     Assembly assembly = typeof(IPageInstance).Module.Assembly;
-                    AssemblyRefCreator.AssemblyRefCreateator(assembly, docName);
+                    progectSettings.IsRefJCMSAdded = AssemblyRefCreator.IsAssemblyRefAdded(assembly, docName);
+                    progectSettings.AddBasePageToCollection("test");
+                    progectSettings.AddBasePageToCollection("test2");
 
-                    #endregion
 
                     XmlNode nameSpace = root.SelectSingleNode("//ns:RootNamespace", nsmgr);
                     jazNamespace = nameSpace.InnerText;
@@ -86,13 +99,17 @@ namespace JazCms.WebProject.WinEditor
                             nodeCollection.Add(node);
                         }
                     }
-                    int checkBoxPossition = 40;
+
+                    List<DataRowComponents> dataRowCollection = new List<DataRowComponents>();
+
                     foreach (XmlNode selectedNodes in nodeCollection)
                     {
+                        DataRowComponents dataRow = new DataRowComponents();
+                        dataRow.IsSelected = false;
+
                         string location = selectedNodes.Attributes.GetNamedItem("Include").Value;
 
-                        CheckBox checkBoxEditedNodes = new CheckBox();
-                        checkBoxEditedNodes.Text = location;
+                        dataRow.Text = location;
                         string xPath = "//ns:Compile[@Include='" + location.Replace(".aspx.cs", ".aspx.jaz.cs") + "']";
                         XmlNodeList jazNodesList = root.SelectNodes(xPath, nsmgr);
                         jazClassName = Path.GetFileName(location).Replace(".aspx.cs", "");
@@ -101,21 +118,8 @@ namespace JazCms.WebProject.WinEditor
                         if (!string.IsNullOrEmpty(directory))
                             jazNamespaceNode = jazNamespace + "." + directory;
 
-                        TextBox tbClassName = new TextBox()
-                        {
-                            Name = "tbClassName" + location,
-                            Text = jazClassName
-                        };
-                        tbClassName.Top = checkBoxPossition;
-                        tbClassName.Left = 50 + location.Trim().Length * 8;
-                        TextBox tbNameSpace = new TextBox()
-                        {
-                            Name = "tbNameSpace" + location,
-                            Text = jazNamespaceNode
-                        };
-                        tbNameSpace.Left = tbClassName.Width + location.Trim().Length * 8 + 70;
-                        tbNameSpace.Width = 200;
-                        tbNameSpace.Top = checkBoxPossition;
+                        dataRow.Namespace = jazNamespaceNode;
+                        dataRow.ClassName = jazClassName;
 
                         string exFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
                         PageSettings pageSet = new PageSettings(exFilePath, location);
@@ -125,42 +129,197 @@ namespace JazCms.WebProject.WinEditor
 
                         if (progectSettings.IsSetted)
                         {
-                            tbNameSpace.Text = progectSettings.SelectedPage.NameSpace;
-                            tbClassName.Text = progectSettings.SelectedPage.ClassName;
+                            dataRow.Namespace = progectSettings.SelectedPage.NameSpace;
+                            dataRow.ClassName = progectSettings.SelectedPage.ClassName;
                         }
-                        groupBoxEditedNodes.Controls.Add(tbNameSpace);
-                        groupBoxEditedNodes.Controls.Add(tbClassName);
+
                         if (jazNodesList.Count > 0)
                         {
-                            checkBoxEditedNodes.Checked = true;
-                            tbNameSpace.Enabled = false;
-                            tbClassName.Enabled = false;
+                            dataRow.IsSelected = true;
                         }
 
-                        checkBoxEditedNodes.Tag = selectedNodes;
-                        checkBoxEditedNodes.Top = checkBoxPossition;
-                        checkBoxEditedNodes.Left = 50;
-                        checkBoxEditedNodes.Width = checkBoxEditedNodes.Text.Trim().Length * 8;
-                        checkBoxPossition += 40;
-                        groupBoxEditedNodes.Height = checkBoxPossition;
-                        groupBoxEditedNodes.Controls.Add(checkBoxEditedNodes);
-
+                        dataRow.Tag = selectedNodes;
+                        dataRow.BasePage = "test2";
+                        dataRowCollection.Add(dataRow);
                     }
 
-                    if (groupBoxEditedNodes.Controls.Count > 0)
+
+                    dataGridNodesTable.AutoGenerateColumns = false;
+
+                    DataSet dataSet = new DataSet("JazCmsDataSet");
+                    DataTable dataTable = new DataTable("DataRowComponentsCollection");
+                    DataTable basePageListTable = new DataTable("BasePageListTable");
+                    basePageListTable.Columns.Add("BasePage",typeof(string));
+
+                    foreach (string page in progectSettings.BasePageCollection)
                     {
-                        labelGuess.Visible = true;
-                        labelGuess.Enabled = true;
-                        labelGuess.Text = "guessed namespaces and class names:";
+                        basePageListTable.Rows.Add(page);
                     }
-                    else
-                        labelGuess.Visible = false;
+
+                    List<string> hiddenColumns = new List<string>(); 
+
+                    foreach(PropertyInfo property in typeof(DataRowComponents).GetProperties())
+                    {
+                        Type type = property.PropertyType;
+                        DisplayNameAttribute[] propertyArrey  = (DisplayNameAttribute[])
+                            (property.GetCustomAttributes(typeof(DisplayNameAttribute), true));
+
+                        HidePropertyAttribute[] hidePropertyArrey = (HidePropertyAttribute[])
+                            (property.GetCustomAttributes(typeof(HidePropertyAttribute), true));
+
+                        DataColumn col;
+                        if (propertyArrey.Count()!= 0)
+                            col = new DataColumn(propertyArrey.First().DisplayName,type);
+                        else
+                            col = new DataColumn(property.Name, type);
+
+                        dataTable.Columns.Add(col);
+
+                        if (hidePropertyArrey.Count() != 0 && hidePropertyArrey.First().IsHidden)
+                            hiddenColumns.Add(col.ColumnName);
+                    }
+
+                    DataColumn dataSource = new DataColumn("DataSource", typeof(DataRowComponents));
+                    dataTable.Columns.Add(dataSource);
+
+                    foreach (DataRowComponents row in dataRowCollection)
+                    {
+                        dataTable.Rows.Add(row.IsSelected, row.Text, row.ClassName, row.Namespace, row.BasePage, row.Tag, row);
+                    }
+
+                    dataSet.Tables.Add(dataTable);
+                    dataSet.Tables.Add(basePageListTable);
+
+                    DataColumn child = dataSet.Tables["DataRowComponentsCollection"].Columns["Custom base page"];
+                    DataColumn parent = dataSet.Tables["BasePageListTable"].Columns["BasePage"];
+                    parent.Unique = true;
+                    ForeignKeyConstraint fk = new ForeignKeyConstraint("FK_BasePage", parent, child);
+                    dataSet.Tables["DataRowComponentsCollection"].Constraints.Add(fk);
+                    dataSet.Relations.Add("BasePage",
+                        parent,
+                        child);
+
+                    DataRelationCollection relationCollection = dataSet.Relations;
+                    SortedList<string,DataRelation> relCollection = new SortedList<string,DataRelation>();
+
+                    foreach (DataRelation rel in relationCollection)
+                    {
+                        if (rel.ChildTable.TableName == "DataRowComponentsCollection")
+                            relCollection.Add(rel.ChildColumns.First().ColumnName, rel);
+                    }
+
+                    foreach (DataColumn col in 
+                        dataTable.Columns)
+                    {
+                        if (relCollection.Keys.Contains(col.ColumnName))
+                        {
+                            DataColumn parentColumn = relCollection.Where(p => p.Key == col.ColumnName)
+                                .Select(p => p.Value).First().ParentColumns.First();
+
+                            DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
+                            comboBoxColumn.Name = col.ColumnName;
+
+                            List<string> sourceList = new List<string>();
+                            foreach (DataRow dgvRow in parentColumn.Table.Rows)
+                                sourceList.Add(dgvRow[parentColumn.ColumnName].ToString());
+
+                            comboBoxColumn.DataSource = sourceList.ToArray();
+                            dataGridNodesTable.Columns.Add(comboBoxColumn);
+
+                            if(hiddenColumns.Contains(col.ColumnName))
+                                comboBoxColumn.Visible = false;
+                        }
+                        else
+                            if (col.DataType == typeof(bool))
+                            {
+                                DataGridViewCheckBoxColumn checkBoxColumn = new DataGridViewCheckBoxColumn();
+                                checkBoxColumn.Name = col.ColumnName;
+                                dataGridNodesTable.Columns.Add(checkBoxColumn);
+
+                                if (hiddenColumns.Contains(col.ColumnName))
+                                    checkBoxColumn.Visible = false;
+                            }
+                            else
+                                if (col.DataType == typeof(string))
+                                {
+                                    DataGridViewTextBoxColumn textBoxColumn = new DataGridViewTextBoxColumn();
+                                    textBoxColumn.Name = col.ColumnName;
+                                    dataGridNodesTable.Columns.Add(textBoxColumn);
+
+                                    if (hiddenColumns.Contains(col.ColumnName))
+                                        textBoxColumn.Visible = false;
+                                }
+                                else
+                                {
+                                    DataGridViewTextBoxColumn column = new DataGridViewTextBoxColumn();
+                                    column.Name = col.ColumnName;
+                                    dataGridNodesTable.Columns.Add(column);
+                                    column.Visible = false;
+
+                                    if (hiddenColumns.Contains(col.ColumnName))
+                                        column.Visible = false;
+                                }
+                    }
+
+                    foreach (DataRowComponents row in dataRowCollection)
+                    {
+
+                        dataGridNodesTable.Rows.Add(
+                            row.IsSelected, row.Text, row.ClassName, row.Namespace 
+                           , row.BasePage,
+                           row.Tag, row
+                            );
+                    }
+
+                    dataGridNodesTable.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+                    dataGridNodesTable.Columns["Path to file"].ReadOnly = true;
+                    dataGridNodesTable.Columns["Tag"].Visible = false;
+                   
+                    DataGridViewButtonColumn buttonColumn = new DataGridViewButtonColumn();
+                    buttonColumn.Name = "Details";
+                    dataGridNodesTable.Columns.Add(buttonColumn);
+
+                    foreach (DataGridViewRow row in dataGridNodesTable.Rows)
+                    {
+                        if ((bool)row.Cells["Existing jaz files"].Value)
+                        {
+                            row.Cells["Guessed class name"].ReadOnly = true;
+                            row.Cells["Guessed namespace"].ReadOnly = true;
+                        }
+
+                        row.Cells["Details"].Value = "...";
+                    }
 
                     #endregion
 
-                    buttonCreate.Top = groupBoxEditedNodes.Height + 50;
-                    buttonCreate.Left = groupBoxEditedNodes.Left + groupBoxEditedNodes.Width - buttonCreate.Width;
-                    groupBoxEditedNodes.UseWaitCursor = false;
+                    buttonCreate.Top = dataGridNodesTable.Height + 100;
+                    buttonCreate.Left = dataGridNodesTable.Left + dataGridNodesTable.Width - buttonCreate.Width;
+                    dataGridNodesTable.UseWaitCursor = false;
+
+                   
+                    foreach (ToolStripMenuItem item in contextMenuStripDataGridView.Items)
+                    {
+                        item.CheckedChanged +=
+                            new EventHandler(contextMenuStripDataGridView_CheckedChanged);
+                        switch (item.Text)
+                        {
+                            case "Class name": item.Tag = "Guessed class name";
+                                break;
+                            case "Namespace": item.Tag = "Guessed namespace";
+                                break;
+                            case "Base page": item.Tag = "Base page";
+                                break;
+                        }
+                    }
+                    #region DataGrid menu
+
+                    dataGridNodesTable.CellMouseClick += new DataGridViewCellMouseEventHandler(dataGridNodesTable_CellContentClick);
+                    dataGridNodesTable.Columns["Details"].HeaderCell.ContextMenuStrip
+                        = contextMenuStripDataGridView;
+                    dataGridNodesTable.EnableHeadersVisualStyles = false;
+                    dataGridNodesTable.Columns["Details"].HeaderCell.Style.ForeColor = Color.Blue;
+         
+                    #endregion
 
                 }
                 catch (Exception ex)
@@ -176,87 +335,114 @@ namespace JazCms.WebProject.WinEditor
             this.Dispose();
         }
 
+        private void dataGridNodesTable_CellContentClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex != -1 && e.ColumnIndex != -1)
+            {
+                DataGridViewCell cell = dataGridNodesTable.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                if (cell.Value != null && cell.Value.ToString() == "...")
+                {
+                    ProgectSettingForm psForm = new ProgectSettingForm();
+                    PropertyGrid propertyGridProjectSettings = (PropertyGrid)
+                    psForm.Controls.Find("propertyGridProjectSettings", true).First();
+                    DataRowComponents source = (DataRowComponents) dataGridNodesTable.Rows[e.RowIndex].Cells["DataSource"].Value;
+                    propertyGridProjectSettings.SelectedObject = source;
+                    psForm.Show();
+
+                }
+            }
+        }
+
+        private void contextMenuStripDataGridView_CheckedChanged(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+
+            if (!item.Checked)
+                dataGridNodesTable.Columns[item.Tag.ToString()].Visible = false;
+            else
+                dataGridNodesTable.Columns[item.Tag.ToString()].Visible = true;
+        
+        }
+
         private void buttonCreate_Click(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(docName))
             {
                 try
                 {
+                    Assembly assembly = typeof(IPageInstance).Module.Assembly;
+                    AssemblyRefCreator.AssemblyRefCreateator(assembly, docName);
+
                     #region nodes cration
 
-                    foreach (Control SelectedNodes in groupBoxEditedNodes.Controls)
+                    foreach (DataGridViewRow row in dataGridNodesTable.Rows)
                     {
-                        
-                        if (SelectedNodes.Tag != null)
+                        DataRowComponents rowData = (DataRowComponents)row.Cells["DataSource"].Value;
+                        XmlNode insertedNode = rowData.Tag as XmlNode;
+                        Uri uri = new Uri(docName);
+                        XmlElement newNode = insertedNode.OwnerDocument.CreateElement("Compile", insertedNode.NamespaceURI);
+
+                        string insertedNodeName = insertedNode.Attributes.GetNamedItem("Include").Value;
+                        string parsedInsertedNodeName = insertedNodeName;
+
+                        parsedInsertedNodeName = Path.GetFileName(insertedNodeName);
+
+                        newNode.SetAttribute("Include", insertedNodeName.Replace("aspx.cs", "aspx.jaz.cs"));
+
+                        XmlElement dependentUponNode =
+                            insertedNode.OwnerDocument.CreateElement("DependentUpon", insertedNode.NamespaceURI);
+                        dependentUponNode.InnerText = parsedInsertedNodeName.Replace(".aspx.cs", ".aspx");
+                        newNode.AppendChild(dependentUponNode);
+
+                        if ((bool)row.Cells["Existing jaz files"].Value)
                         {
-                            CheckBox cBSelectedNodes = (CheckBox)SelectedNodes;
-
-                            XmlNode insertedNode = cBSelectedNodes.Tag as XmlNode;
-                            Uri uri = new Uri(docName);
-                            XmlElement newNode = insertedNode.OwnerDocument.CreateElement("Compile", insertedNode.NamespaceURI);
-
-                            string insertedNodeName = insertedNode.Attributes.GetNamedItem("Include").Value;
-                            string parsedInsertedNodeName = insertedNodeName;
-
-                            parsedInsertedNodeName = Path.GetFileName(insertedNodeName);
-
-                            newNode.SetAttribute("Include", insertedNodeName.Replace("aspx.cs", "aspx.jaz.cs"));
-
-                            XmlElement dependentUponNode =
-                                insertedNode.OwnerDocument.CreateElement("DependentUpon", insertedNode.NamespaceURI);
-                            dependentUponNode.InnerText = parsedInsertedNodeName.Replace(".aspx.cs", ".aspx");
-                            newNode.AppendChild(dependentUponNode);
-
-                            if (cBSelectedNodes.Checked)
+                            if (insertedNode.ParentNode.SelectNodes("*[@Include='" +
+                                insertedNodeName.Replace("aspx.cs", "aspx.jaz.cs") + "']").Count == 0)
                             {
-                                if (insertedNode.ParentNode.SelectNodes("*[@Include='" +
-                                    insertedNodeName.Replace("aspx.cs", "aspx.jaz.cs") + "']").Count == 0)
-                                {
-                                    insertedNode.ParentNode.InsertAfter(newNode, insertedNode);
-                                    insertedNode.OwnerDocument.Save(docName);
-                                    string fileFullPath = docName.Replace(uri.Segments[uri.Segments.Length - 1].ToString(), "") +
+                                insertedNode.ParentNode.InsertAfter(newNode, insertedNode);
+                                insertedNode.OwnerDocument.Save(docName);
+                                string fileFullPath = docName.Replace(uri.Segments[uri.Segments.Length - 1].ToString(), "") +
+                                         insertedNode.Attributes.GetNamedItem("Include").Value
+                                         .Replace("aspx.cs", "aspx.jaz.cs");
+                                progectSettings.AddNewJazFile(fileFullPath);
+                                FileInfo newFile = new FileInfo(fileFullPath);
+                                FileStream fs = newFile.Create();
+                                fs.Dispose();
+                                CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
+                                string ns = row.Cells["Guessed namespace"].Value.ToString();
+                                string cn = row.Cells["Guessed class name"].Value.ToString();
+                                FileGenerator.GenerateCode
+                                    (
+                                     provider,
+                                     FileGenerator.BuildJAZContent(ns, cn, insertedNodeName),
+                                     fileFullPath
+                                    );
+                                string exportFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
+                                PageSettings pageSet = new PageSettings(exportFilePath, insertedNodeName, ns, cn);
+                                XmlStoreProvider storeProvider = new XmlStoreProvider(exportFilePath);
+                                progectSettings.SelectedPage = pageSet;
+                                storeProvider.SaveSettings(progectSettings);
+                            }
+                        }
+                        else
+                        {
+                            XmlNode removedNode = insertedNode.ParentNode.SelectSingleNode("*[@Include='" +
+                                insertedNodeName.Replace("aspx.cs", "aspx.jaz.cs") + "']");
+                            if (removedNode != null)
+                            {
+
+                                insertedNode.ParentNode.RemoveChild(removedNode);
+                                insertedNode.OwnerDocument.Save(docName);
+                                string unselectedFileName = docName.Replace(uri.Segments[uri.Segments.Length - 1].ToString(), "") +
                                              insertedNode.Attributes.GetNamedItem("Include").Value
                                              .Replace("aspx.cs", "aspx.jaz.cs");
-                                    progectSettings.AddNewJazFile(fileFullPath);
-                                    FileInfo newFile = new FileInfo(fileFullPath);
-                                    FileStream fs = newFile.Create();
-                                    fs.Dispose();
-                                    CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
-                                    TextBox tbNS = (TextBox)groupBoxEditedNodes.Controls.Find("tbNameSpace" + insertedNodeName, true).First();
-                                    TextBox tbCN = (TextBox)groupBoxEditedNodes.Controls.Find("tbClassName" + insertedNodeName, true).First();
-                                    FileGenerator.GenerateCode
-                                        (
-                                         provider, 
-                                         FileGenerator.BuildJAZContent(tbNS.Text, tbCN.Text, insertedNodeName),
-                                         fileFullPath
-                                        );
-                                    string exportFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
-                                    PageSettings pageSet = new PageSettings(exportFilePath, insertedNodeName, tbNS.Text, tbCN.Text);
-                                    XmlStoreProvider storeProvider = new XmlStoreProvider(exportFilePath);
-                                    progectSettings.SelectedPage = pageSet;
-                                    storeProvider.SaveSettings(progectSettings);
-                                 }
+                                FileInfo newFile = new FileInfo(unselectedFileName);
+                                newFile.Delete();
+
+                                if (progectSettings.GetJazFileCollection().Contains(unselectedFileName))
+                                    progectSettings.RemoveJazFileFromCollection(unselectedFileName);
                             }
-                            else
-                            {
-                                XmlNode removedNode = insertedNode.ParentNode.SelectSingleNode("*[@Include='" +
-                                    insertedNodeName.Replace("aspx.cs", "aspx.jaz.cs") + "']");
-                                if (removedNode != null)
-                                {
 
-                                    insertedNode.ParentNode.RemoveChild(removedNode);
-                                    insertedNode.OwnerDocument.Save(docName);
-                                    string unselectedFileName = docName.Replace(uri.Segments[uri.Segments.Length - 1].ToString(), "") +
-                                                 insertedNode.Attributes.GetNamedItem("Include").Value
-                                                 .Replace("aspx.cs", "aspx.jaz.cs");
-                                    FileInfo newFile = new FileInfo(unselectedFileName);
-                                    newFile.Delete();
-
-                                    if (progectSettings.GetJazFileCollection().Contains(unselectedFileName))
-                                        progectSettings.RemoveJazFileFromCollection(unselectedFileName);
-                                }
-
-                            }
                         }
                     }
                     MessageBox.Show("Modify proccess successed", "executed", MessageBoxButtons.OK);
@@ -269,8 +455,8 @@ namespace JazCms.WebProject.WinEditor
                 }
                 finally
                 {
-                   groupBoxEditedNodes.Controls.Clear();
-                   labelGuess.Visible = false;
+                    dataGridNodesTable.Rows.Clear();
+                    dataGridNodesTable.Columns.Clear();
                 }
             }
 
@@ -278,13 +464,115 @@ namespace JazCms.WebProject.WinEditor
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            groupBoxEditedNodes.Controls.Clear();
-            labelGuess.Visible = false;
+            dataGridNodesTable.Rows.Clear();
+            dataGridNodesTable.Columns.Clear();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-           this.buttonCreate_Click(sender, e);
+            this.buttonCreate_Click(sender, e);
         }
+
+        private void projectSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ProgectSettingForm settingForm = new ProgectSettingForm();
+            PropertyGrid propertyGridProjectSettings = (PropertyGrid)
+                settingForm.Controls.Find("propertyGridProjectSettings",true).First();
+            propertyGridProjectSettings.SelectedObject = this.progectSettings;
+            settingForm.Show();
+        }
+   }
+
+    public class DataRowComponents
+    {
+        private bool _IsSelected;
+        private string _Text;
+        private string _ClassName;
+        private string _Namespace;
+        private string _BasePage;
+
+        [DisplayName("Existing jaz files")]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                _IsSelected = value;
+            }
+
+        }
+
+        [DisplayName("Path to file")]
+        public string Text
+        {
+            get
+            {
+                return _Text;
+            }
+            set
+            {
+                _Text = value;
+            }
+        }
+
+        [DisplayName("Guessed class name")]
+        public string ClassName
+        {
+            get
+            {
+                return _ClassName;
+            }
+            set
+            {
+                _ClassName = value;
+            }
+        }
+
+        [DisplayName("Guessed namespace")]
+        public string Namespace
+        {
+            get
+            {
+                return _Namespace;
+            }
+            set
+            {
+                _Namespace = value;
+            }
+        }
+
+        [DisplayName("Custom base page")]
+        public string BasePage
+        {
+            get
+            {
+                return _BasePage;
+            }
+            set
+            {
+                _BasePage = value;
+            }
+        }
+
+       
+        private object _Tag;
+        [HideProperty(true)]
+        public object Tag
+        {
+            get
+            {
+                return _Tag;
+            }
+            set
+            {
+                _Tag = value;
+            }
+
+        }
+
     }
+
 }

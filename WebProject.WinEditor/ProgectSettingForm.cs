@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace JazCms.WebProject.WinEditor
 {
-    public partial class SelectProgectDialogForm : Form
+    public partial class ProgectSettingForm : Form
     {
-        public SelectProgectDialogForm()
+        public ProgectSettingForm()
         {
             InitializeComponent();
         }

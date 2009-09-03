@@ -9,6 +9,23 @@ namespace JazCms.WebProject
 {
     public static class AssemblyRefCreator
     {
+        public static bool IsAssemblyRefAdded(Assembly assembly, string docName)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(docName);
+            XmlNode root = doc.DocumentElement;
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
+            nsmgr.AddNamespace("ns", root.NamespaceURI);
+
+            XmlNode refSelectedNode = root.SelectSingleNode("//ns:ItemGroup/ns:Reference[@Include='" +
+                          assembly.FullName + "']", nsmgr);
+
+            if (refSelectedNode == null)
+                return false;
+
+            return true;
+        }
+
         public static void AssemblyRefCreateator(Assembly assembly, string docName)
         {
             XmlDocument doc = new XmlDocument();
