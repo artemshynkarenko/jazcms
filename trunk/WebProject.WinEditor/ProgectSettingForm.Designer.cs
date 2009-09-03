@@ -1,6 +1,6 @@
 ﻿namespace JazCms.WebProject.WinEditor
 {
-    partial class SelectProgectDialogForm
+    partial class ProgectSettingForm
     {
         /// <summary>
         /// Required designer variable.
@@ -30,6 +30,7 @@
         {
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.label1 = new System.Windows.Forms.Label();
+            this.propertyGridProjectSettings = new System.Windows.Forms.PropertyGrid();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -41,19 +42,29 @@
             // label1
             // 
             this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label1.ForeColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(24, 13);
+            this.label1.Size = new System.Drawing.Size(95, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "test";
+            this.label1.Text = "Project settings";
             // 
-            // SelectProgectDialogForm
+            // propertyGridProjectSettings
+            // 
+            this.propertyGridProjectSettings.Location = new System.Drawing.Point(12, 36);
+            this.propertyGridProjectSettings.Name = "propertyGridProjectSettings";
+            this.propertyGridProjectSettings.Size = new System.Drawing.Size(356, 282);
+            this.propertyGridProjectSettings.TabIndex = 1;
+            // 
+            // ProgectSettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 264);
+            this.ClientSize = new System.Drawing.Size(380, 330);
+            this.Controls.Add(this.propertyGridProjectSettings);
             this.Controls.Add(this.label1);
-            this.Name = "SelectProgectDialogForm";
+            this.Name = "ProgectSettingForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "SelectProgectDialogForm";
             this.ResumeLayout(false);
@@ -65,5 +76,6 @@
 
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.PropertyGrid propertyGridProjectSettings;
     }
 }
