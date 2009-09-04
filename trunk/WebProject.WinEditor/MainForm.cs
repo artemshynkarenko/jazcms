@@ -30,6 +30,9 @@ namespace JazCms.WebProject.WinEditor
         protected string jazClassName;
         protected ProjectSettings progectSettings;
 
+        const string OldFileExtension = ".aspx.cs";
+        const string NewFileExtension = ".aspx.jaz.cs";
+
         public MainForm()
         {
             docName = string.Empty;
@@ -94,7 +97,7 @@ namespace JazCms.WebProject.WinEditor
                     List<XmlNode> nodeCollection = new List<XmlNode>();
                     foreach (XmlNode node in nodeList)
                     {
-                        if (node.Attributes.GetNamedItem("Include").Value.Contains(".aspx.cs"))
+                        if (node.Attributes.GetNamedItem("Include").Value.Contains(OldFileExtension))
                         {
                             nodeCollection.Add(node);
                         }
@@ -110,9 +113,9 @@ namespace JazCms.WebProject.WinEditor
                         string location = selectedNodes.Attributes.GetNamedItem("Include").Value;
 
                         dataRow.Text = location;
-                        string xPath = "//ns:Compile[@Include='" + location.Replace(".aspx.cs", ".aspx.jaz.cs") + "']";
+                        string xPath = "//ns:Compile[@Include='" + location.Replace(OldFileExtension, NewFileExtension) + "']";
                         XmlNodeList jazNodesList = root.SelectNodes(xPath, nsmgr);
-                        jazClassName = Path.GetFileName(location).Replace(".aspx.cs", "");
+                        jazClassName = Path.GetFileName(location).Replace(OldFileExtension, "");
                         string directory = Path.GetDirectoryName(location).Replace("\\", ".");
                         string jazNamespaceNode = jazNamespace;
                         if (!string.IsNullOrEmpty(directory))
@@ -313,6 +316,7 @@ namespace JazCms.WebProject.WinEditor
                     }
                     #region DataGrid menu
 
+                    dataGridNodesTable.CellMouseClick -= new DataGridViewCellMouseEventHandler(dataGridNodesTable_CellContentClick);
                     dataGridNodesTable.CellMouseClick += new DataGridViewCellMouseEventHandler(dataGridNodesTable_CellContentClick);
                     dataGridNodesTable.Columns["Details"].HeaderCell.ContextMenuStrip
                         = contextMenuStripDataGridView;
@@ -397,13 +401,13 @@ namespace JazCms.WebProject.WinEditor
                         if ((bool)row.Cells["Existing jaz files"].Value)
                         {
                             if (insertedNode.ParentNode.SelectNodes("*[@Include='" +
-                                insertedNodeName.Replace("aspx.cs", "aspx.jaz.cs") + "']").Count == 0)
+                                insertedNodeName.Replace(OldFileExtension, NewFileExtension) + "']").Count == 0)
                             {
                                 insertedNode.ParentNode.InsertAfter(newNode, insertedNode);
                                 insertedNode.OwnerDocument.Save(docName);
                                 string fileFullPath = docName.Replace(uri.Segments[uri.Segments.Length - 1].ToString(), "") +
                                          insertedNode.Attributes.GetNamedItem("Include").Value
-                                         .Replace("aspx.cs", "aspx.jaz.cs");
+                                         .Replace(OldFileExtension, NewFileExtension);
                                 progectSettings.AddNewJazFile(fileFullPath);
                                 FileInfo newFile = new FileInfo(fileFullPath);
                                 FileStream fs = newFile.Create();
@@ -427,7 +431,7 @@ namespace JazCms.WebProject.WinEditor
                         else
                         {
                             XmlNode removedNode = insertedNode.ParentNode.SelectSingleNode("*[@Include='" +
-                                insertedNodeName.Replace("aspx.cs", "aspx.jaz.cs") + "']");
+                                insertedNodeName.Replace(OldFileExtension, NewFileExtension) + "']");
                             if (removedNode != null)
                             {
 
@@ -435,7 +439,7 @@ namespace JazCms.WebProject.WinEditor
                                 insertedNode.OwnerDocument.Save(docName);
                                 string unselectedFileName = docName.Replace(uri.Segments[uri.Segments.Length - 1].ToString(), "") +
                                              insertedNode.Attributes.GetNamedItem("Include").Value
-                                             .Replace("aspx.cs", "aspx.jaz.cs");
+                                             .Replace(OldFileExtension, NewFileExtension);
                                 FileInfo newFile = new FileInfo(unselectedFileName);
                                 newFile.Delete();
 
