@@ -39,48 +39,21 @@ namespace JazCms.WebProject
                 IList<MemberInfo> memberInfoCollection = interf.GetMembers().ToList();
                 foreach (MemberInfo member in memberInfoCollection)
                 {
-                    if (member.MemberType.ToString() == "Property")
+                    if (member.MemberType == MemberTypes.Property)
                     {
-                        List<MemberInfo> setMethodsList = memberInfoCollection.Where(
-                            c => c.MemberType.ToString() == "Method" && c.Name.Contains("set_" + member.Name)
-                            ).ToList();
-
-                        CodeMemberProperty propertyCTM = new CodeMemberProperty();
-                        propertyCTM.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-                        propertyCTM.Name = member.Name;
-                        CodeTypeReference typeRef = new CodeTypeReference(((PropertyInfo)(member)).PropertyType);
-                        propertyCTM.Type = typeRef;
-                        if (setMethodsList.Count > 0)
-                        {
-                            propertyCTM.SetStatements.Add(cs1);
-                        }
-                        propertyCTM.GetStatements.Add(cs1);
+                        CodeMemberProperty propertyCTM = PropertyGenerator.GenerateProperty(member, cs1, cs1);
                         jazClass.Members.Add(propertyCTM);
                     }
-                    else if (member.MemberType.ToString() == "Method")
+                    else if (member.MemberType == MemberTypes.Method)
                     {
                         List<MemberInfo> setMethodsListForProperty = memberInfoCollection.Where(
-                         c => c.MemberType.ToString() == "Property" &&
+                         c => c.MemberType == MemberTypes.Property &&
                              (member.Name.Contains("set_" + c.Name) || member.Name.Contains("get_" + c.Name))
                          ).ToList();
                         if (setMethodsListForProperty.Count() == 0)
                         {
-                            CodeMemberMethod methodCTM = new CodeMemberMethod();
-                            methodCTM.Name = member.Name;
-                            methodCTM.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-                            CodeTypeReference methodTypeRef = new CodeTypeReference(((MethodInfo)(member)).ReturnType);
-                            methodCTM.ReturnType = methodTypeRef;
-
-                            List<ParameterInfo> methodParameters = ((System.Reflection.MethodInfo)(member)).GetParameters().ToList();
-                            CodeParameterDeclarationExpressionCollection parameterCollection = new CodeParameterDeclarationExpressionCollection();
-                            foreach (ParameterInfo info in methodParameters)
-                            {
-                                CodeParameterDeclarationExpression expresion = new CodeParameterDeclarationExpression(info.ParameterType, info.Name);
-                                parameterCollection.Add(expresion);
-                            }
-                            methodCTM.Parameters.AddRange(parameterCollection); 
+                            CodeMemberMethod methodCTM = MethodGenerator.GenerateMethod(member, cs1);
                             jazClass.Members.Add(methodCTM);
-                            methodCTM.Statements.Add(cs1);
                         }
                     }
                 }
