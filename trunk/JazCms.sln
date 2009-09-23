@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazCms.WebProject.WinEditor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazCms.StoreProviders.XmlStore", "StoreProviders\XmlStore\JazCms.StoreProviders.XmlStore.csproj", "{24D17132-35AB-4C0F-AF72-475900ECF7B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazCms.WinEditor.Controls", "WinEditor\JazCms.WinEditor.Controls.csproj", "{EEAD1869-287D-4BED-B035-2EFA6E322739}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazCms.WinEditor.Controls", "WinEditor\Controls\JazCms.WinEditor.Controls.csproj", "{EEAD1869-287D-4BED-B035-2EFA6E322739}"
 EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
