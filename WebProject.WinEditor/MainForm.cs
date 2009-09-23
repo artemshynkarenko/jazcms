@@ -310,7 +310,7 @@ namespace JazCms.WebProject.WinEditor
                                 break;
                             case "Namespace": item.Tag = "Guessed namespace";
                                 break;
-                            case "Base page": item.Tag = "Base page";
+                            case "Base page": item.Tag = "Custom base page";
                                 break;
                         }
                     }
