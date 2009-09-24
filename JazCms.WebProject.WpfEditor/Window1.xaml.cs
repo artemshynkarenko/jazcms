@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Xml;
 using System.Xml.XPath;
@@ -16,14 +23,19 @@ using System.Diagnostics;
 using Microsoft.CSharp;
 using System.Reflection;
 using System.ComponentModel.Design;
-using JazCms.Kernel;
 using JazCms.WebProject;
+using JazCms.Kernel;
+using Microsoft.Win32;
 using JazCms.StoreProviders.XmlStore;
+using System.Windows.Forms.Integration;
 
-namespace JazCms.WebProject.WinEditor
+
+namespace JazCms.WebProject.WpfEditor
 {
-
-    public partial class MainForm : Form
+    /// <summary>
+    /// Interaction logic for Window1.xaml
+    /// </summary>
+    public partial class Window1 : Window
     {
         protected string docName;
         protected string jazNamespace;
@@ -33,22 +45,15 @@ namespace JazCms.WebProject.WinEditor
         const string OldFileExtension = ".aspx.cs";
         const string NewFileExtension = ".aspx.jaz.cs";
 
-        public MainForm()
+        public Window1()
         {
             docName = string.Empty;
             jazNamespace = string.Empty;
             jazClassName = string.Empty;
             progectSettings = new ProjectSettings();
             InitializeComponent();
-            this.SizeChanged += new EventHandler(page_SizeChanged);
-        }
-
-        protected void page_SizeChanged(object sender, EventArgs e)
-        {
-            dataGridNodesTable.Width = this.Width - 50;
-            dataGridNodesTable.Height = this.Height - 200;
-            buttonCreate.Top = dataGridNodesTable.Height + 50;
-            buttonCreate.Left = dataGridNodesTable.Width - 150;
+            dataGridNodesTable.AutoGenerateColumns = false;
+           
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -62,7 +67,7 @@ namespace JazCms.WebProject.WinEditor
             ofd.FilterIndex = 1;
             ofd.RestoreDirectory = true;
 
-            if (ofd.ShowDialog() == DialogResult.OK)
+            if (ofd.ShowDialog() == true)
             {
                 try
                 {
@@ -75,7 +80,7 @@ namespace JazCms.WebProject.WinEditor
                     docName = ofd.FileName.ToString();
                     doc.Load(docName);
                     XmlDocument docExport = new XmlDocument();
-                    string exportFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
+                    string exportFilePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(docName), "ExportSetting.xml");
                     progectSettings.ExportFileName = exportFilePath;
 
                     XmlNode root = doc.DocumentElement;
@@ -115,8 +120,8 @@ namespace JazCms.WebProject.WinEditor
                         dataRow.Text = location;
                         string xPath = "//ns:Compile[@Include='" + location.Replace(OldFileExtension, NewFileExtension) + "']";
                         XmlNodeList jazNodesList = root.SelectNodes(xPath, nsmgr);
-                        jazClassName = Path.GetFileName(location).Replace(OldFileExtension, "");
-                        string directory = Path.GetDirectoryName(location).Replace("\\", ".");
+                        jazClassName = System.IO.Path.GetFileName(location).Replace(OldFileExtension, "");
+                        string directory = System.IO.Path.GetDirectoryName(location).Replace("\\", ".");
                         string jazNamespaceNode = jazNamespace;
                         if (!string.IsNullOrEmpty(directory))
                             jazNamespaceNode = jazNamespace + "." + directory;
@@ -124,7 +129,7 @@ namespace JazCms.WebProject.WinEditor
                         dataRow.Namespace = jazNamespaceNode;
                         dataRow.ClassName = jazClassName;
 
-                        string exFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
+                        string exFilePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(docName), "ExportSetting.xml");
                         PageSettings pageSet = new PageSettings(exFilePath, location);
                         XmlStoreProvider storeProvider = new XmlStoreProvider(exFilePath);
                         progectSettings.SelectedPage = pageSet;
@@ -152,27 +157,27 @@ namespace JazCms.WebProject.WinEditor
                     DataSet dataSet = new DataSet("JazCmsDataSet");
                     DataTable dataTable = new DataTable("DataRowComponentsCollection");
                     DataTable basePageListTable = new DataTable("BasePageListTable");
-                    basePageListTable.Columns.Add("BasePage",typeof(string));
+                    basePageListTable.Columns.Add("BasePage", typeof(string));
 
                     foreach (string page in progectSettings.BasePageCollection)
                     {
                         basePageListTable.Rows.Add(page);
                     }
 
-                    List<string> hiddenColumns = new List<string>(); 
+                    List<string> hiddenColumns = new List<string>();
 
-                    foreach(PropertyInfo property in typeof(DataRowComponents).GetProperties())
+                    foreach (PropertyInfo property in typeof(DataRowComponents).GetProperties())
                     {
                         Type type = property.PropertyType;
-                        DisplayNameAttribute[] propertyArrey  = (DisplayNameAttribute[])
+                        DisplayNameAttribute[] propertyArrey = (DisplayNameAttribute[])
                             (property.GetCustomAttributes(typeof(DisplayNameAttribute), true));
 
                         HidePropertyAttribute[] hidePropertyArrey = (HidePropertyAttribute[])
                             (property.GetCustomAttributes(typeof(HidePropertyAttribute), true));
 
                         DataColumn col;
-                        if (propertyArrey.Count()!= 0)
-                            col = new DataColumn(propertyArrey.First().DisplayName,type);
+                        if (propertyArrey.Count() != 0)
+                            col = new DataColumn(propertyArrey.First().DisplayName, type);
                         else
                             col = new DataColumn(property.Name, type);
 
@@ -203,7 +208,7 @@ namespace JazCms.WebProject.WinEditor
                         child);
 
                     DataRelationCollection relationCollection = dataSet.Relations;
-                    SortedList<string,DataRelation> relCollection = new SortedList<string,DataRelation>();
+                    SortedList<string, DataRelation> relCollection = new SortedList<string, DataRelation>();
 
                     foreach (DataRelation rel in relationCollection)
                     {
@@ -211,7 +216,7 @@ namespace JazCms.WebProject.WinEditor
                             relCollection.Add(rel.ChildColumns.First().ColumnName, rel);
                     }
 
-                    foreach (DataColumn col in 
+                    foreach (DataColumn col in
                         dataTable.Columns)
                     {
                         if (relCollection.Keys.Contains(col.ColumnName))
@@ -219,7 +224,8 @@ namespace JazCms.WebProject.WinEditor
                             DataColumn parentColumn = relCollection.Where(p => p.Key == col.ColumnName)
                                 .Select(p => p.Value).First().ParentColumns.First();
 
-                            DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
+                            System.Windows.Forms.DataGridViewComboBoxColumn comboBoxColumn = 
+                                new System.Windows.Forms.DataGridViewComboBoxColumn();
                             comboBoxColumn.Name = col.ColumnName;
 
                             List<string> sourceList = new List<string>();
@@ -229,13 +235,14 @@ namespace JazCms.WebProject.WinEditor
                             comboBoxColumn.DataSource = sourceList.ToArray();
                             dataGridNodesTable.Columns.Add(comboBoxColumn);
 
-                            if(hiddenColumns.Contains(col.ColumnName))
+                            if (hiddenColumns.Contains(col.ColumnName))
                                 comboBoxColumn.Visible = false;
                         }
                         else
                             if (col.DataType == typeof(bool))
                             {
-                                DataGridViewCheckBoxColumn checkBoxColumn = new DataGridViewCheckBoxColumn();
+                                System.Windows.Forms.DataGridViewCheckBoxColumn checkBoxColumn = 
+                                    new System.Windows.Forms.DataGridViewCheckBoxColumn();
                                 checkBoxColumn.Name = col.ColumnName;
                                 dataGridNodesTable.Columns.Add(checkBoxColumn);
 
@@ -245,7 +252,8 @@ namespace JazCms.WebProject.WinEditor
                             else
                                 if (col.DataType == typeof(string))
                                 {
-                                    DataGridViewTextBoxColumn textBoxColumn = new DataGridViewTextBoxColumn();
+                                    System.Windows.Forms.DataGridViewTextBoxColumn textBoxColumn = 
+                                        new System.Windows.Forms.DataGridViewTextBoxColumn();
                                     textBoxColumn.Name = col.ColumnName;
                                     dataGridNodesTable.Columns.Add(textBoxColumn);
 
@@ -254,7 +262,8 @@ namespace JazCms.WebProject.WinEditor
                                 }
                                 else
                                 {
-                                    DataGridViewTextBoxColumn column = new DataGridViewTextBoxColumn();
+                                    System.Windows.Forms.DataGridViewTextBoxColumn column =
+                                        new System.Windows.Forms.DataGridViewTextBoxColumn();
                                     column.Name = col.ColumnName;
                                     dataGridNodesTable.Columns.Add(column);
                                     column.Visible = false;
@@ -268,42 +277,58 @@ namespace JazCms.WebProject.WinEditor
                     {
 
                         dataGridNodesTable.Rows.Add(
-                            row.IsSelected, row.Text, row.ClassName, row.Namespace 
+                            row.IsSelected, row.Text, row.ClassName, row.Namespace
                            , row.BasePage,
                            row.Tag, row
                             );
                     }
 
-                    dataGridNodesTable.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+                    dataGridNodesTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
                     dataGridNodesTable.Columns["Path to file"].ReadOnly = true;
                     dataGridNodesTable.Columns["Tag"].Visible = false;
-                   
-                    DataGridViewButtonColumn buttonColumn = new DataGridViewButtonColumn();
+
+                    System.Windows.Forms.DataGridViewButtonColumn buttonColumn = 
+                        new System.Windows.Forms.DataGridViewButtonColumn();
                     buttonColumn.Name = "Details";
                     dataGridNodesTable.Columns.Add(buttonColumn);
 
-                    foreach (DataGridViewRow row in dataGridNodesTable.Rows)
+                    foreach (System.Windows.Forms.DataGridViewRow row in dataGridNodesTable.Rows)
                     {
                         if ((bool)row.Cells["Existing jaz files"].Value)
-                        {
-                            row.Cells["Guessed class name"].ReadOnly = true;
-                            row.Cells["Guessed namespace"].ReadOnly = true;
-                        }
+                            {
+                                row.Cells["Guessed class name"].ReadOnly = true;
+                                row.Cells["Guessed namespace"].ReadOnly = true;
+                            }
 
-                        row.Cells["Details"].Value = "...";
+                            row.Cells["Details"].Value = "...";
                     }
 
                     #endregion
 
-                    buttonCreate.Top = dataGridNodesTable.Height + 100;
-                    buttonCreate.Left = dataGridNodesTable.Left + dataGridNodesTable.Width - buttonCreate.Width;
                     dataGridNodesTable.UseWaitCursor = false;
 
-                    foreach (ToolStripMenuItem item in contextMenuStripDataGridView.Items)
+                    System.Windows.Forms.ContextMenuStrip contextMenuStripDataGridView = 
+                        new System.Windows.Forms.ContextMenuStrip();
+                    System.Windows.Forms.ToolStripMenuItem existingJazFiles = new System.Windows.Forms.ToolStripMenuItem()
+                    { Text = "Existing Jaz files", Enabled=false};
+                    System.Windows.Forms.ToolStripMenuItem path = new System.Windows.Forms.ToolStripMenuItem() 
+                    { Text = "Path to page", Enabled = false };
+                    contextMenuStripDataGridView.Items.Add(existingJazFiles);
+                    contextMenuStripDataGridView.Items.Add(path);
+                    contextMenuStripDataGridView.Items.Add("Class name");
+                    contextMenuStripDataGridView.Items.Add("Namespace");
+                    contextMenuStripDataGridView.Items.Add("Base page");
+                    foreach(System.Windows.Forms.ToolStripMenuItem contextItem in contextMenuStripDataGridView.Items)
+                    {
+                        contextItem.CheckOnClick = true;
+                        contextItem.Checked = true;
+                    }
+
+                    foreach (System.Windows.Forms.ToolStripMenuItem item in contextMenuStripDataGridView.Items)
                     {
                         item.CheckedChanged +=
                             new EventHandler(contextMenuStripDataGridView_CheckedChanged);
-                        switch (item.Text)
+                        switch (item.Text.ToString())
                         {
                             case "Class name": item.Tag = "Guessed class name";
                                 break;
@@ -315,13 +340,13 @@ namespace JazCms.WebProject.WinEditor
                     }
                     #region DataGrid menu
 
-                    dataGridNodesTable.CellMouseClick -= new DataGridViewCellMouseEventHandler(dataGridNodesTable_CellContentClick);
-                    dataGridNodesTable.CellMouseClick += new DataGridViewCellMouseEventHandler(dataGridNodesTable_CellContentClick);
+                    dataGridNodesTable.CellMouseClick -= new System.Windows.Forms.DataGridViewCellMouseEventHandler(dataGridNodesTable_CellContentClick);
+                    dataGridNodesTable.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(dataGridNodesTable_CellContentClick);
                     dataGridNodesTable.Columns["Details"].HeaderCell.ContextMenuStrip
                         = contextMenuStripDataGridView;
                     dataGridNodesTable.EnableHeadersVisualStyles = false;
-                    dataGridNodesTable.Columns["Details"].HeaderCell.Style.ForeColor = Color.Blue;
-         
+                    dataGridNodesTable.Columns["Details"].HeaderCell.Style.ForeColor = System.Drawing.Color.Blue;
+                    
                     #endregion
 
                 }
@@ -335,20 +360,20 @@ namespace JazCms.WebProject.WinEditor
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Dispose();
+            this.Close();
         }
 
-        private void dataGridNodesTable_CellContentClick(object sender, DataGridViewCellMouseEventArgs e)
+        private void dataGridNodesTable_CellContentClick(object sender, System.Windows.Forms.DataGridViewCellMouseEventArgs e)
         {
             if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
-                DataGridViewCell cell = dataGridNodesTable.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                System.Windows.Forms.DataGridViewCell cell = dataGridNodesTable.Rows[e.RowIndex].Cells[e.ColumnIndex];
                 if (cell.Value != null && cell.Value.ToString() == "...")
                 {
-                    ProgectSettingForm psForm = new ProgectSettingForm();
-                    PropertyGrid propertyGridProjectSettings = (PropertyGrid)
-                    psForm.Controls.Find("propertyGridProjectSettings", true).First();
-                    DataRowComponents source = (DataRowComponents) dataGridNodesTable.Rows[e.RowIndex].Cells["DataSource"].Value;
+                    SettingsPage psForm = new SettingsPage();
+                    psForm.Title = "FILE SETTINGS";
+                    System.Windows.Forms.PropertyGrid propertyGridProjectSettings = psForm.propertyGridProjectSettings;
+                    DataRowComponents source = (DataRowComponents)dataGridNodesTable.Rows[e.RowIndex].Cells["DataSource"].Value;
                     propertyGridProjectSettings.SelectedObject = source;
                     psForm.Show();
 
@@ -358,17 +383,18 @@ namespace JazCms.WebProject.WinEditor
 
         private void contextMenuStripDataGridView_CheckedChanged(object sender, EventArgs e)
         {
-            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            System.Windows.Forms.ToolStripMenuItem item = sender as System.Windows.Forms.ToolStripMenuItem;
 
             if (!item.Checked)
                 dataGridNodesTable.Columns[item.Tag.ToString()].Visible = false;
             else
                 dataGridNodesTable.Columns[item.Tag.ToString()].Visible = true;
-        
+
         }
 
         private void buttonCreate_Click(object sender, EventArgs e)
         {
+            dataGridNodesTable.CommitEdit(System.Windows.Forms.DataGridViewDataErrorContexts.Commit);
             if (!string.IsNullOrEmpty(docName))
             {
                 try
@@ -378,7 +404,7 @@ namespace JazCms.WebProject.WinEditor
 
                     #region nodes cration
 
-                    foreach (DataGridViewRow row in dataGridNodesTable.Rows)
+                    foreach (System.Windows.Forms.DataGridViewRow row in dataGridNodesTable.Rows)
                     {
                         DataRowComponents rowData = (DataRowComponents)row.Cells["DataSource"].Value;
                         XmlNode insertedNode = rowData.Tag as XmlNode;
@@ -388,7 +414,7 @@ namespace JazCms.WebProject.WinEditor
                         string insertedNodeName = insertedNode.Attributes.GetNamedItem("Include").Value;
                         string parsedInsertedNodeName = insertedNodeName;
 
-                        parsedInsertedNodeName = Path.GetFileName(insertedNodeName);
+                        parsedInsertedNodeName = System.IO.Path.GetFileName(insertedNodeName);
 
                         newNode.SetAttribute("Include", insertedNodeName.Replace("aspx.cs", "aspx.jaz.cs"));
 
@@ -399,8 +425,7 @@ namespace JazCms.WebProject.WinEditor
 
                         if ((bool)row.Cells["Existing jaz files"].Value)
                         {
-                            if (insertedNode.ParentNode.SelectNodes("*[@Include='" +
-                                insertedNodeName.Replace(OldFileExtension, NewFileExtension) + "']").Count == 0)
+                            if (insertedNode.ParentNode.SelectNodes("*[@Include='"+insertedNodeName.Replace(OldFileExtension,NewFileExtension)+"']").Count == 0)
                             {
                                 insertedNode.ParentNode.InsertAfter(newNode, insertedNode);
                                 insertedNode.OwnerDocument.Save(docName);
@@ -420,7 +445,7 @@ namespace JazCms.WebProject.WinEditor
                                      FileGenerator.BuildJAZContent(ns, cn, insertedNodeName),
                                      fileFullPath
                                     );
-                                string exportFilePath = Path.Combine(Path.GetDirectoryName(docName), "ExportSetting.xml");
+                                string exportFilePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(docName), "ExportSetting.xml");
                                 PageSettings pageSet = new PageSettings(exportFilePath, insertedNodeName, ns, cn);
                                 XmlStoreProvider storeProvider = new XmlStoreProvider(exportFilePath);
                                 progectSettings.SelectedPage = pageSet;
@@ -448,7 +473,7 @@ namespace JazCms.WebProject.WinEditor
 
                         }
                     }
-                    MessageBox.Show("Modify proccess successed", "executed", MessageBoxButtons.OK);
+                    MessageBox.Show("Modify proccess successed", "executed", MessageBoxButton.OK);
                     #endregion
 
                 }
@@ -478,13 +503,13 @@ namespace JazCms.WebProject.WinEditor
 
         private void projectSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ProgectSettingForm settingForm = new ProgectSettingForm();
-            PropertyGrid propertyGridProjectSettings = (PropertyGrid)
-                settingForm.Controls.Find("propertyGridProjectSettings",true).First();
+            SettingsPage settingForm = new SettingsPage();
+            settingForm.Title = "PROJECT SETTINGS";
+            System.Windows.Forms.PropertyGrid propertyGridProjectSettings = settingForm.propertyGridProjectSettings;
             propertyGridProjectSettings.SelectedObject = this.progectSettings;
             settingForm.Show();
         }
-   }
+    }
 
     public class DataRowComponents
     {
@@ -560,7 +585,7 @@ namespace JazCms.WebProject.WinEditor
             }
         }
 
-       
+
         private object _Tag;
         [HideProperty(true)]
         public object Tag
@@ -577,5 +602,4 @@ namespace JazCms.WebProject.WinEditor
         }
 
     }
-
 }

@@ -1,0 +1,64 @@
+﻿<Window x:Class="JazCms.WebProject.WpfEditor.Window1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" 
+    Title="Window1" Height="500" Width="800">
+    <Grid Name="jazGrid">
+        <DockPanel Name="DockPanel_Menu" Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="0" Grid.RowSpan="1" 
+             HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="25" Background="White">
+            <Menu Name="MainMenu">
+                <MenuItem Header="File">
+                    <MenuItem Header="New" Click="newToolStripMenuItem_Click">
+                        <MenuItem.ToolTip>
+                            <ToolTip>
+                                Click here to add contact
+                            </ToolTip>
+                        </MenuItem.ToolTip>
+                    </MenuItem>
+                    <MenuItem Header="Open" Click="openToolStripMenuItem_Click">
+                        <MenuItem.ToolTip>
+                            <ToolTip>
+                                Click here to add contact
+                            </ToolTip>
+                        </MenuItem.ToolTip>
+                    </MenuItem>
+                    <MenuItem Header="Save" Click="saveToolStripMenuItem_Click">
+                        <MenuItem.ToolTip>
+                            <ToolTip>
+                                Click here to add contact
+                            </ToolTip>
+                        </MenuItem.ToolTip>
+                    </MenuItem>
+                    <MenuItem Header="Remove" Click="newToolStripMenuItem_Click">
+                        <MenuItem.ToolTip>
+                            <ToolTip>
+                                Click here to add contact
+                            </ToolTip>
+                        </MenuItem.ToolTip>
+                    </MenuItem>
+                    <MenuItem Header="Project settings" Click="projectSettingsToolStripMenuItem_Click">
+                        <MenuItem.ToolTip>
+                            <ToolTip>
+                                Click here to exit
+                            </ToolTip>
+                        </MenuItem.ToolTip>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Exit" InputGestureText="Alt-F4" Click="exitToolStripMenuItem_Click">
+                        <MenuItem.ToolTip>
+                            <ToolTip>
+                                Click here to exit
+                            </ToolTip>
+                        </MenuItem.ToolTip>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+         <WindowsFormsHost Name="Host" Margin="0px,25px,0px,80px">
+             <wf:DataGridView x:Name="dataGridNodesTable" 
+              AllowUserToAddRows="False" AllowUserToDeleteRows="False" EditMode="EditOnKeystroke">
+            </wf:DataGridView>
+        </WindowsFormsHost>
+        <Button Name="buttonCreate" Click="buttonCreate_Click" Width="169" Height="40" HorizontalAlignment="Right" Margin="0,0,12,12" VerticalAlignment="Bottom">Modify</Button>
+    </Grid>
+</Window>
