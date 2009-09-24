@@ -41,11 +41,11 @@
             this.buttonCreate = new System.Windows.Forms.Button();
             this.dataGridNodesTable = new System.Windows.Forms.DataGridView();
             this.contextMenuStripDataGridView = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.existingJazFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pathToPageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.classNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.namespaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.basePageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.existingJazFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridNodesTable)).BeginInit();
             this.contextMenuStripDataGridView.SuspendLayout();
@@ -164,6 +164,15 @@
             this.contextMenuStripDataGridView.Name = "contextMenuStripDataGridView";
             this.contextMenuStripDataGridView.Size = new System.Drawing.Size(162, 114);
             // 
+            // existingJazFilesToolStripMenuItem
+            // 
+            this.existingJazFilesToolStripMenuItem.Checked = true;
+            this.existingJazFilesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.existingJazFilesToolStripMenuItem.Enabled = false;
+            this.existingJazFilesToolStripMenuItem.Name = "existingJazFilesToolStripMenuItem";
+            this.existingJazFilesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.existingJazFilesToolStripMenuItem.Text = "Existing jaz files";
+            // 
             // pathToPageToolStripMenuItem
             // 
             this.pathToPageToolStripMenuItem.Checked = true;
@@ -200,15 +209,6 @@
             this.basePageToolStripMenuItem.Name = "basePageToolStripMenuItem";
             this.basePageToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.basePageToolStripMenuItem.Text = "Base page";
-            // 
-            // existingJazFilesToolStripMenuItem
-            // 
-            this.existingJazFilesToolStripMenuItem.Checked = true;
-            this.existingJazFilesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.existingJazFilesToolStripMenuItem.Enabled = false;
-            this.existingJazFilesToolStripMenuItem.Name = "existingJazFilesToolStripMenuItem";
-            this.existingJazFilesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
-            this.existingJazFilesToolStripMenuItem.Text = "Existing jaz files";
             // 
             // MainForm
             // 

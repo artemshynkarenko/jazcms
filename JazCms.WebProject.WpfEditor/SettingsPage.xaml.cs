@@ -27,5 +27,6 @@ namespace JazCms.WebProject.WpfEditor
         {
             this.Close();
         }
+
     }
 }
