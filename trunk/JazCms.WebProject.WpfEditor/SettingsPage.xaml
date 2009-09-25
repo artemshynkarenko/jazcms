@@ -2,7 +2,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" 
-    Title="SettingsPage" Height="500" Width="500">
+    Title="SettingsPage" Height="500" Width="500"
+    Icon="favicon.ico">
     <Grid>
         <WindowsFormsHost Margin="0,0,0,48">
             <wf:PropertyGrid x:Name="propertyGridProjectSettings"></wf:PropertyGrid>
