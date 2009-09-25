@@ -7,6 +7,7 @@
         <WindowsFormsHost Margin="0,0,0,48">
             <wf:PropertyGrid x:Name="propertyGridProjectSettings"></wf:PropertyGrid>
         </WindowsFormsHost>
-        <Button Name="buttonExit" Click="buttonExit_Close" Height="40px" Margin="0,0,0,2" VerticalAlignment="Bottom">OK</Button>
+        <Button Name="buttonExit" Click="buttonExit_Close" Height="40px" Margin="0,0,0,2" VerticalAlignment="Bottom">
+            OK</Button>
     </Grid>
 </Window>
