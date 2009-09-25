@@ -214,9 +214,25 @@ namespace JazCms.WebProject.WpfEditor
                             relCollection.Add(rel.ChildColumns.First().ColumnName, rel);
                     }
 
+                    GridView gridview = new GridView();
+
                     foreach (DataColumn col in
                         dataTable.Columns)
                     {
+                        //Create the GridView and create GridViewColumns
+          
+                        GridViewColumn gvcolumn = new GridViewColumn();
+                        gvcolumn.Header = col.ColumnName;
+                        EditBox tb = new EditBox();
+                        DataTemplate template = new DataTemplate();
+                        template.DataType = typeof(EditBox);
+                        gvcolumn.CellTemplate = template;
+                        gvcolumn.DisplayMemberBinding = new Binding(col.ColumnName);
+
+                        gridview.Columns.Add(gvcolumn);
+
+                       //end filling of grid view
+
                         if (relCollection.Keys.Contains(col.ColumnName))
                         {
                             DataColumn parentColumn = relCollection.Where(p => p.Key == col.ColumnName)
@@ -350,10 +366,25 @@ namespace JazCms.WebProject.WpfEditor
                         = contextMenuStripDataGridView;
                     dataGridNodesTable.EnableHeadersVisualStyles = false;
                     dataGridNodesTable.Columns["Details"].HeaderCell.Style.ForeColor = System.Drawing.Color.Blue;
-                    Host.Visibility = Visibility.Visible;
-                    
+
                     #endregion
 
+                    //Host.Visibility = Visibility.Visible;
+
+                    //Set the ListView's View to GridView
+                    listview.View = gridview;
+
+                    //Set the DataContext property of the ListView to the DataTable and bind the ItemsSourceProperty to {Binding}
+                    Binding bind = new Binding();
+                    listview.DataContext = dataTable;
+
+                    listview.SetBinding(ListView.ItemsSourceProperty, bind);
+                    listview.Focus();
+                    //Set the content of the Window to the ListView
+                    //Content = listview;
+
+                    //end list view
+                   
                 }
                 catch (Exception ex)
                 {
@@ -479,7 +510,11 @@ namespace JazCms.WebProject.WpfEditor
                         }
                     }
                     Host.Visibility = Visibility.Hidden;
-                    MessageBox.Show("Modify proccess successed", "executed", MessageBoxButton.OK);
+
+                    if (dataGridNodesTable.Rows.Count != 0)
+                    {
+                        MessageBox.Show("Modify proccess successed", "executed", MessageBoxButton.OK);
+                    }
                     #endregion
 
                 }
