@@ -52,8 +52,6 @@ namespace JazCms.WebProject.WpfEditor
             jazClassName = string.Empty;
             progectSettings = new ProjectSettings();
             InitializeComponent();
-            dataGridNodesTable.AutoGenerateColumns = false;
-           
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -255,6 +253,7 @@ namespace JazCms.WebProject.WpfEditor
                                     System.Windows.Forms.DataGridViewTextBoxColumn textBoxColumn = 
                                         new System.Windows.Forms.DataGridViewTextBoxColumn();
                                     textBoxColumn.Name = col.ColumnName;
+                                    textBoxColumn.ReadOnly = false;
                                     dataGridNodesTable.Columns.Add(textBoxColumn);
 
                                     if (hiddenColumns.Contains(col.ColumnName))
@@ -265,6 +264,7 @@ namespace JazCms.WebProject.WpfEditor
                                     System.Windows.Forms.DataGridViewTextBoxColumn column =
                                         new System.Windows.Forms.DataGridViewTextBoxColumn();
                                     column.Name = col.ColumnName;
+                                    column.ReadOnly = false;
                                     dataGridNodesTable.Columns.Add(column);
                                     column.Visible = false;
 
@@ -297,7 +297,11 @@ namespace JazCms.WebProject.WpfEditor
                         if ((bool)row.Cells["Existing jaz files"].Value)
                             {
                                 row.Cells["Guessed class name"].ReadOnly = true;
+                                row.Cells["Guessed class name"].Style.BackColor = System.Drawing.Color.LightGray;
+                                row.Cells["Guessed class name"].Style.ForeColor = System.Drawing.Color.Gray;
                                 row.Cells["Guessed namespace"].ReadOnly = true;
+                                row.Cells["Guessed namespace"].Style.BackColor = System.Drawing.Color.LightGray;
+                                row.Cells["Guessed namespace"].Style.ForeColor = System.Drawing.Color.Gray;
                             }
 
                             row.Cells["Details"].Value = "...";
@@ -346,6 +350,7 @@ namespace JazCms.WebProject.WpfEditor
                         = contextMenuStripDataGridView;
                     dataGridNodesTable.EnableHeadersVisualStyles = false;
                     dataGridNodesTable.Columns["Details"].HeaderCell.Style.ForeColor = System.Drawing.Color.Blue;
+                    Host.Visibility = Visibility.Visible;
                     
                     #endregion
 
@@ -473,6 +478,7 @@ namespace JazCms.WebProject.WpfEditor
 
                         }
                     }
+                    Host.Visibility = Visibility.Hidden;
                     MessageBox.Show("Modify proccess successed", "executed", MessageBoxButton.OK);
                     #endregion
 
@@ -494,6 +500,7 @@ namespace JazCms.WebProject.WpfEditor
         {
             dataGridNodesTable.Rows.Clear();
             dataGridNodesTable.Columns.Clear();
+            Host.Visibility = Visibility.Hidden;
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
