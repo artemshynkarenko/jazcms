@@ -5,6 +5,9 @@
     Icon="favicon.ico"
     Title="Window1" Height="500" Width="800">
     <Window.Resources>
+            <DataTemplate x:Name="buttonDetailTemplate" x:Key="buttonDetailTemplate">
+                    <Button Width="50px" Click="innerButtonInListView_Click">...</Button>
+            </DataTemplate>
         <ControlTemplate x:Key="GlassButton" TargetType="{x:Type Button}">
             <ControlTemplate.Resources>
                 <Storyboard x:Key="Timeline1">
@@ -162,7 +165,7 @@
         <ListView x:Name="listview" IsSynchronizedWithCurrentItem="True" Margin="50px,100px,50px,150px" SelectedItem="0"
                   Background="Transparent" BorderBrush="Transparent">
         </ListView>
-        <Button Click="buttonCreate_Click" Foreground="#FFFFFFFF" Template="{DynamicResource GlassButton}" 
+        <Button Click="buttonCreate_Click" Foreground="#FFFFFFFF" Template="{DynamicResource GlassButton}"
                 Name="buttonCreate" HorizontalAlignment="Center" Margin="0,0,0,30" VerticalAlignment="Bottom" Width="170" Height="30">
             Modify
         </Button>
