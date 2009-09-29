@@ -29,7 +29,6 @@ using Microsoft.Win32;
 using JazCms.StoreProviders.XmlStore;
 using System.Windows.Forms.Integration;
 
-
 namespace JazCms.WebProject.WpfEditor
 {
     /// <summary>
@@ -215,24 +214,19 @@ namespace JazCms.WebProject.WpfEditor
                     }
 
                     GridView gridview = new GridView();
+                    listview.DataContext = dataTable;
+                    Binding bind = new Binding();
+                    listview.ItemsSource = dataTable as IEnumerable;
 
                     foreach (DataColumn col in
                         dataTable.Columns)
                     {
-                        //Create the GridView and create GridViewColumns
           
                         GridViewColumn gvcolumn = new GridViewColumn();
                         gvcolumn.Header = col.ColumnName;
-                        EditBox tb = new EditBox();
-                        DataTemplate template = new DataTemplate();
-                        template.DataType = typeof(EditBox);
-                        gvcolumn.CellTemplate = template;
-                        gvcolumn.DisplayMemberBinding = new Binding(col.ColumnName);
-
-                        gridview.Columns.Add(gvcolumn);
-
-                       //end filling of grid view
-
+                        if (hiddenColumns.Contains(col.ColumnName))
+                            gvcolumn.Width = 0;
+                      
                         if (relCollection.Keys.Contains(col.ColumnName))
                         {
                             DataColumn parentColumn = relCollection.Where(p => p.Key == col.ColumnName)
@@ -251,6 +245,29 @@ namespace JazCms.WebProject.WpfEditor
 
                             if (hiddenColumns.Contains(col.ColumnName))
                                 comboBoxColumn.Visible = false;
+
+                            DataTemplate dtCombo = new DataTemplate();
+                            dtCombo.DataType = typeof(String);
+                            FrameworkElementFactory fefCombo = new FrameworkElementFactory(typeof(ComboBox));
+                            Binding bdCombo = new Binding(col.ColumnName);
+
+                            List<string> basePagesList = new List<string>();
+
+                            foreach (DataRow comboRow in basePageListTable.Rows)
+                            {
+                                basePagesList.Add(comboRow.ItemArray.First().ToString());
+                            }
+                            ComboBox templateComboBox = new ComboBox();
+                            templateComboBox.FontSize = 12;
+                            fefCombo.SetValue(ComboBox.ItemsSourceProperty, basePagesList);
+                            fefCombo.SetValue(ComboBox.BackgroundProperty, new SolidColorBrush(Colors.Transparent));
+                            fefCombo.SetValue(ComboBox.ForegroundProperty, new SolidColorBrush(Colors.Goldenrod));
+                            fefCombo.SetValue(ComboBox.BorderBrushProperty, new SolidColorBrush(Colors.Transparent));
+                            fefCombo.SetValue(ComboBox.FontSizeProperty, templateComboBox.FontSize);
+                            fefCombo.SetBinding(ComboBox.SelectedItemProperty, bdCombo);
+                            dtCombo.VisualTree = fefCombo;
+                            gvcolumn.CellTemplate = dtCombo;
+                            gridview.Columns.Add(gvcolumn);
                         }
                         else
                             if (col.DataType == typeof(bool))
@@ -262,6 +279,15 @@ namespace JazCms.WebProject.WpfEditor
 
                                 if (hiddenColumns.Contains(col.ColumnName))
                                     checkBoxColumn.Visible = false;
+
+                                DataTemplate dtCheckbox = new DataTemplate();
+                                dtCheckbox.DataType = typeof(Boolean);
+                                FrameworkElementFactory fefCheckbox = new FrameworkElementFactory(typeof(CheckBox));
+                                Binding bdCheckbox = new Binding(col.ColumnName);
+                                fefCheckbox.SetBinding(CheckBox.IsCheckedProperty, bdCheckbox);
+                                dtCheckbox.VisualTree = fefCheckbox;
+                                gvcolumn.CellTemplate = dtCheckbox;
+                                gridview.Columns.Add(gvcolumn);
                             }
                             else
                                 if (col.DataType == typeof(string))
@@ -274,6 +300,26 @@ namespace JazCms.WebProject.WpfEditor
 
                                     if (hiddenColumns.Contains(col.ColumnName))
                                         textBoxColumn.Visible = false;
+
+
+                                    DataTemplate dtTextBox = new DataTemplate();
+                                    dtTextBox.DataType = typeof(string);
+                                    FrameworkElementFactory fefTextBox = new FrameworkElementFactory(typeof(TextBox));
+                                    Binding bdTextBox = new Binding(col.ColumnName);
+                                    fefTextBox.SetBinding(TextBox.TextProperty, bdTextBox);
+                                    TextBox templateTB = new TextBox();
+                                    templateTB.FontSize = 12;
+
+                                    if (col.ColumnName == "Path to file")
+                                       fefTextBox.SetValue(TextBox.IsReadOnlyProperty, true);
+
+                                    fefTextBox.SetValue(TextBox.BackgroundProperty, new SolidColorBrush(Colors.Transparent));
+                                    fefTextBox.SetValue(TextBox.ForegroundProperty, new SolidColorBrush(Colors.Goldenrod));
+                                    fefTextBox.SetValue(TextBox.FontSizeProperty, templateTB.FontSize);
+                                    fefTextBox.SetValue(TextBox.BorderBrushProperty, new SolidColorBrush(Colors.Transparent));
+                                    dtTextBox.VisualTree = fefTextBox;
+                                    gvcolumn.CellTemplate = dtTextBox;
+                                    gridview.Columns.Add(gvcolumn);
                                 }
                                 else
                                 {
@@ -286,6 +332,9 @@ namespace JazCms.WebProject.WpfEditor
 
                                     if (hiddenColumns.Contains(col.ColumnName))
                                         column.Visible = false;
+
+                                    gvcolumn.Width = 0;
+                                    gridview.Columns.Add(gvcolumn);
                                 }
                     }
 
@@ -308,6 +357,74 @@ namespace JazCms.WebProject.WpfEditor
                     buttonColumn.Name = "Details";
                     dataGridNodesTable.Columns.Add(buttonColumn);
 
+                    GridViewColumn buttonDetailColumn = new GridViewColumn();
+
+                    DataTemplate dtButtonDetail = new DataTemplate();
+                    dtButtonDetail.DataType = typeof(String);
+
+                    Button templateButton = new Button();
+                    templateButton.Width = 50;
+
+                    FrameworkElementFactory fefForButton = new FrameworkElementFactory(typeof(Button));
+                    fefForButton.SetValue(Button.ContentProperty, "...");
+                    fefForButton.SetValue(Button.WidthProperty, templateButton.Width);
+                    Binding bdButton = new Binding(dataTable.Columns["DataSource"].ColumnName);
+                    fefForButton.SetBinding(Button.TagProperty, bdButton);
+                    fefForButton.AddHandler(Button.ClickEvent, new RoutedEventHandler(innerButtonInListView_Click));
+
+                    Binding bindButtonDetail = new Binding();
+                    fefForButton.SetBinding(TextBox.NameProperty, bindButtonDetail);
+                    dtButtonDetail.VisualTree = fefForButton;
+
+                    buttonDetailColumn.CellTemplate = dtButtonDetail;
+
+                    #region DataGrid menu
+
+                    ContextMenu contextMenuVisibleColumns = new ContextMenu();
+                    MenuItem existingJazFiles = new MenuItem() { Header = "Existing Jaz files", IsEnabled = false };
+                    MenuItem path = new MenuItem() { Header = "Path to page", IsEnabled = false };
+                    MenuItem classNameMenuItem = new MenuItem(){Header = "Class name"};
+                    MenuItem namespaceMenuItem = new MenuItem() {Header = "Namespace"};
+                    MenuItem basePageMenuItem = new MenuItem() { Header = "Base page" }; 
+                    contextMenuVisibleColumns.Items.Add(existingJazFiles);
+                    contextMenuVisibleColumns.Items.Add(path);
+                    contextMenuVisibleColumns.Items.Add(classNameMenuItem);
+                    contextMenuVisibleColumns.Items.Add(namespaceMenuItem);
+                    contextMenuVisibleColumns.Items.Add(basePageMenuItem);
+                    foreach (MenuItem contextItem in contextMenuVisibleColumns.Items)
+                    {
+                        contextItem.IsCheckable = true;
+                        contextItem.IsChecked = true;
+
+                         contextItem.Checked +=
+                            new RoutedEventHandler(contextMenuStripDataGridView_CheckedChanged);
+                         contextItem.Unchecked +=
+                            new RoutedEventHandler(contextMenuStripDataGridView_CheckedChanged);
+                        switch (contextItem.Header.ToString())
+                        {
+                            case "Class name": contextItem.Tag = "Guessed class name";
+                                break;
+                            case "Namespace": contextItem.Tag = "Guessed namespace";
+                                break;
+                            case "Base page": contextItem.Tag = "Custom base page";
+                                break;
+                       }
+                    }
+
+                    #endregion
+
+                    FrameworkElementFactory fefHeaderMenuButton = new FrameworkElementFactory(typeof(Button));
+                    fefHeaderMenuButton.SetValue(Button.ContentProperty, "Details");
+                    fefHeaderMenuButton.SetValue(Button.ContextMenuProperty, contextMenuVisibleColumns);
+                    DataTemplate dtHeaderMenuButton = new DataTemplate();
+                    dtHeaderMenuButton.VisualTree = fefHeaderMenuButton;
+                    buttonDetailColumn.HeaderTemplate = dtHeaderMenuButton;
+
+                    gridview.Columns.Add(buttonDetailColumn);
+                    listview.View = gridview;
+                    listview.SetBinding(ListView.ItemsSourceProperty, bind);
+                    listview.Focus();
+  
                     foreach (System.Windows.Forms.DataGridViewRow row in dataGridNodesTable.Rows)
                     {
                         if ((bool)row.Cells["Existing jaz files"].Value)
@@ -325,62 +442,6 @@ namespace JazCms.WebProject.WpfEditor
 
                     #endregion
 
-                    dataGridNodesTable.UseWaitCursor = false;
-
-                    System.Windows.Forms.ContextMenuStrip contextMenuStripDataGridView = 
-                        new System.Windows.Forms.ContextMenuStrip();
-                    System.Windows.Forms.ToolStripMenuItem existingJazFiles = new System.Windows.Forms.ToolStripMenuItem()
-                    { Text = "Existing Jaz files", Enabled=false};
-                    System.Windows.Forms.ToolStripMenuItem path = new System.Windows.Forms.ToolStripMenuItem() 
-                    { Text = "Path to page", Enabled = false };
-                    contextMenuStripDataGridView.Items.Add(existingJazFiles);
-                    contextMenuStripDataGridView.Items.Add(path);
-                    contextMenuStripDataGridView.Items.Add("Class name");
-                    contextMenuStripDataGridView.Items.Add("Namespace");
-                    contextMenuStripDataGridView.Items.Add("Base page");
-                    foreach(System.Windows.Forms.ToolStripMenuItem contextItem in contextMenuStripDataGridView.Items)
-                    {
-                        contextItem.CheckOnClick = true;
-                        contextItem.Checked = true;
-                    }
-
-                    foreach (System.Windows.Forms.ToolStripMenuItem item in contextMenuStripDataGridView.Items)
-                    {
-                        item.CheckedChanged +=
-                            new EventHandler(contextMenuStripDataGridView_CheckedChanged);
-                        switch (item.Text.ToString())
-                        {
-                            case "Class name": item.Tag = "Guessed class name";
-                                break;
-                            case "Namespace": item.Tag = "Guessed namespace";
-                                break;
-                            case "Base page": item.Tag = "Custom base page";
-                                break;
-                        }
-                    }
-                    #region DataGrid menu
-
-                    dataGridNodesTable.CellMouseClick -= new System.Windows.Forms.DataGridViewCellMouseEventHandler(dataGridNodesTable_CellContentClick);
-                    dataGridNodesTable.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(dataGridNodesTable_CellContentClick);
-                    dataGridNodesTable.Columns["Details"].HeaderCell.ContextMenuStrip
-                        = contextMenuStripDataGridView;
-                    dataGridNodesTable.EnableHeadersVisualStyles = false;
-                    dataGridNodesTable.Columns["Details"].HeaderCell.Style.ForeColor = System.Drawing.Color.Blue;
-
-                    #endregion
-
-                    //Host.Visibility = Visibility.Visible;
-
-                    //Set the ListView's View to GridView
-                    listview.View = gridview;
-
-                    //Set the DataContext property of the ListView to the DataTable and bind the ItemsSourceProperty to {Binding}
-                    Binding bind = new Binding();
-                    listview.DataContext = dataTable;
-
-                    listview.SetBinding(ListView.ItemsSourceProperty, bind);
-                    listview.Focus();
-                    //Set the content of the Window to the ListView
                     //Content = listview;
 
                     //end list view
@@ -419,18 +480,17 @@ namespace JazCms.WebProject.WpfEditor
 
         private void contextMenuStripDataGridView_CheckedChanged(object sender, EventArgs e)
         {
-            System.Windows.Forms.ToolStripMenuItem item = sender as System.Windows.Forms.ToolStripMenuItem;
+            MenuItem item = sender as MenuItem;
 
-            if (!item.Checked)
-                dataGridNodesTable.Columns[item.Tag.ToString()].Visible = false;
+            if (!item.IsChecked)
+                ((GridView)listview.View).Columns.Where(c => c.Header.ToString() == item.Tag.ToString()).First().Width = 0;
             else
-                dataGridNodesTable.Columns[item.Tag.ToString()].Visible = true;
+                ((GridView)listview.View).Columns.Where(c => c.Header.ToString() == item.Tag.ToString()).First().Width = double.NaN;
 
         }
 
         private void buttonCreate_Click(object sender, EventArgs e)
         {
-            dataGridNodesTable.CommitEdit(System.Windows.Forms.DataGridViewDataErrorContexts.Commit);
             if (!string.IsNullOrEmpty(docName))
             {
                 try
@@ -440,9 +500,9 @@ namespace JazCms.WebProject.WpfEditor
 
                     #region nodes cration
 
-                    foreach (System.Windows.Forms.DataGridViewRow row in dataGridNodesTable.Rows)
+                    foreach (DataRow row in ((DataView)listview.ItemsSource).Table.Rows)
                     {
-                        DataRowComponents rowData = (DataRowComponents)row.Cells["DataSource"].Value;
+                        DataRowComponents rowData = (DataRowComponents)row["DataSource"];
                         XmlNode insertedNode = rowData.Tag as XmlNode;
                         Uri uri = new Uri(docName);
                         XmlElement newNode = insertedNode.OwnerDocument.CreateElement("Compile", insertedNode.NamespaceURI);
@@ -459,7 +519,7 @@ namespace JazCms.WebProject.WpfEditor
                         dependentUponNode.InnerText = parsedInsertedNodeName.Replace(".aspx.cs", ".aspx");
                         newNode.AppendChild(dependentUponNode);
 
-                        if ((bool)row.Cells["Existing jaz files"].Value)
+                        if ((bool)row["Existing jaz files"])
                         {
                             if (insertedNode.ParentNode.SelectNodes("*[@Include='"+insertedNodeName.Replace(OldFileExtension,NewFileExtension)+"']").Count == 0)
                             {
@@ -473,8 +533,8 @@ namespace JazCms.WebProject.WpfEditor
                                 FileStream fs = newFile.Create();
                                 fs.Dispose();
                                 CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
-                                string ns = row.Cells["Guessed namespace"].Value.ToString();
-                                string cn = row.Cells["Guessed class name"].Value.ToString();
+                                string ns = row["Guessed namespace"].ToString();
+                                string cn = row["Guessed class name"].ToString();
                                 FileGenerator.GenerateCode
                                     (
                                      provider,
@@ -511,7 +571,7 @@ namespace JazCms.WebProject.WpfEditor
                     }
                     Host.Visibility = Visibility.Hidden;
 
-                    if (dataGridNodesTable.Rows.Count != 0)
+                    if (((DataView)listview.ItemsSource).Table.Rows.Count != 0)
                     {
                         MessageBox.Show("Modify proccess successed", "executed", MessageBoxButton.OK);
                     }
@@ -527,6 +587,7 @@ namespace JazCms.WebProject.WpfEditor
                     dataGridNodesTable.Rows.Clear();
                     dataGridNodesTable.Columns.Clear();
                 }
+
             }
 
         }
@@ -550,6 +611,17 @@ namespace JazCms.WebProject.WpfEditor
             System.Windows.Forms.PropertyGrid propertyGridProjectSettings = settingForm.propertyGridProjectSettings;
             propertyGridProjectSettings.SelectedObject = this.progectSettings;
             settingForm.Show();
+        }
+
+
+        private void innerButtonInListView_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsPage psForm = new SettingsPage();
+            psForm.Title = "FILE SETTINGS";
+            System.Windows.Forms.PropertyGrid propertyGridProjectSettings = psForm.propertyGridProjectSettings;
+            DataRowComponents source = (DataRowComponents)((Button)sender).Tag;
+            propertyGridProjectSettings.SelectedObject = source;
+            psForm.Show();
         }
     }
 
