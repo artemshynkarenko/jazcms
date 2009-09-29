@@ -157,11 +157,6 @@
             </Menu>
         </DockPanel>
         
-         <WindowsFormsHost Name="Host" Margin="50px,100px,50px,150px" Background="Transparent" Visibility="Hidden">
-             <wf:DataGridView x:Name="dataGridNodesTable" BorderStyle="Fixed3D" BackgroundColor="White" ShowEditingIcon="True" ShowRowErrors="True"
-              AllowUserToAddRows="False" AllowUserToDeleteRows="False" EditMode="EditOnKeystroke" ShowCellErrors="True" ShowCellToolTips="True">
-            </wf:DataGridView>
-        </WindowsFormsHost>
         <ListView x:Name="listview" IsSynchronizedWithCurrentItem="True" Margin="50px,100px,50px,150px" SelectedItem="0"
                   Background="Transparent" BorderBrush="Transparent">
         </ListView>
